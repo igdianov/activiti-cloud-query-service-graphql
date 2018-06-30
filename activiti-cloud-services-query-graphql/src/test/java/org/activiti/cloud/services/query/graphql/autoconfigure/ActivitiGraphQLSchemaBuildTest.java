@@ -45,7 +45,6 @@ public class ActivitiGraphQLSchemaBuildTest {
     }
     
     @Test
-    @Ignore
     public void correctlyDerivesSchemaFromGivenEntities() {
         //when
         GraphQLSchema schema = builder.build();
@@ -92,7 +91,6 @@ public class ActivitiGraphQLSchemaBuildTest {
     }
 
     @Test
-    @Ignore
     public void correctlyDerivesPageableSchemaFromGivenEntities() {
         //when
         GraphQLSchema schema = builder.build();
