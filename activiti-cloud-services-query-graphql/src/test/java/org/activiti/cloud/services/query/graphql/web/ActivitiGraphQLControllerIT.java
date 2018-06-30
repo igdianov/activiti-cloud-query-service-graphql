@@ -28,6 +28,7 @@ import graphql.ExecutionResult;
 import graphql.GraphQLError;
 import org.activiti.cloud.services.query.graphql.autoconfigure.EnableActivitiGraphQLQueryService;
 import org.activiti.cloud.services.query.graphql.web.ActivitiGraphQLController.GraphQLQueryRequest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +73,7 @@ public class ActivitiGraphQLControllerIT {
             .describedAs(result.getErrors().toString())
             .isTrue();
 
-        assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=Normal}]}}")
+        assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=5}]}}")
             .isEqualTo(result.getData().toString());
 
     }
@@ -135,7 +136,7 @@ public class ActivitiGraphQLControllerIT {
             .describedAs(result.getErrors().toString())
             .isTrue();
 
-        assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=Normal}]}}")
+        assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=5}]}}")
             .isEqualTo(result.getData().toString());
     }
 }
