@@ -15,8 +15,8 @@
  */
 package org.activiti.cloud.services.query.qraphql.ws.config;
 
-import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
 import graphql.GraphQL;
+import org.activiti.cloud.services.query.qraphql.ws.datafetcher.GraphQLSubscriptionExecutor;
 import org.activiti.cloud.services.query.qraphql.ws.datafetcher.StompRelayDestinationResolver;
 import org.activiti.cloud.services.query.qraphql.ws.datafetcher.StompRelayPublisherFactory;
 import org.activiti.cloud.services.query.qraphql.ws.transport.GraphQLBrokerMessageHandler;
@@ -109,7 +109,7 @@ public class GraphQLWebSocketMessageBrokerAutoConfiguration {
                                                           MessageChannel clientOutboundChannel,
                                                           SubscribableChannel brokerChannel,
                                                           TaskScheduler messageBrokerTaskScheduler,
-                                                          GraphQLExecutor graphQLSubscriptionExecutor) {
+                                                          GraphQLSubscriptionExecutor graphQLSubscriptionExecutor) {
             GraphQLBrokerMessageHandler messageHandler = new GraphQLBrokerMessageHandler(clientInboundChannel,
                     clientOutboundChannel,
                     brokerChannel,
