@@ -19,6 +19,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.validation.annotation.Validated;
 
 @ConfigurationProperties(prefix="spring.activiti.cloud.services.query.graphql")
@@ -52,6 +55,15 @@ public class ActivitiGraphQLSchemaProperties {
      */
     @NotBlank
     private String path = "/graphql";
+
+    @Configuration
+    @PropertySource("classpath:META-INF/graphql.properties")
+    @PropertySource(value="classpath:graphql.properties", ignoreResourceNotFound=true)
+    @EnableConfigurationProperties(ActivitiGraphQLSchemaProperties.class)
+    public static class AutoConfiguration {
+
+    }
+
 
     /**
      * Default constructor

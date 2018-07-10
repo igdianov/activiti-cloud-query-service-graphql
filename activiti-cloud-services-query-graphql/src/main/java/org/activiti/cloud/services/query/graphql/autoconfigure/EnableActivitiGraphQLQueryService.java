@@ -24,7 +24,6 @@ import java.lang.annotation.Target;
 
 import org.activiti.cloud.services.query.graphql.autoconfigure.ActivitiGraphQLAutoConfiguration.DefaultActivitiGraphQLJpaConfiguration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
 
 /**
  * Enables configuration of Activiti GraphQL Query Service components
@@ -34,6 +33,5 @@ import org.springframework.context.annotation.PropertySource;
 @Retention( RUNTIME )
 @Target( TYPE )
 @Import(DefaultActivitiGraphQLJpaConfiguration.class)
-@PropertySource("classpath:/org/activiti/cloud/services/query/graphql/default.properties")
 public @interface EnableActivitiGraphQLQueryService {
 }
