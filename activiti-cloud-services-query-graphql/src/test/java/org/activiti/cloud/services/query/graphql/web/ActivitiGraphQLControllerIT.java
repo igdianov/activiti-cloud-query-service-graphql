@@ -28,7 +28,6 @@ import graphql.ExecutionResult;
 import graphql.GraphQLError;
 import org.activiti.cloud.services.query.graphql.autoconfigure.EnableActivitiGraphQLQueryService;
 import org.activiti.cloud.services.query.graphql.web.ActivitiGraphQLController.GraphQLQueryRequest;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +57,7 @@ public class ActivitiGraphQLControllerIT {
 
     @Test
     public void testGraphql() {
-        GraphQLQueryRequest query = new GraphQLQueryRequest("{Tasks(where:{name:{EQ: \"" + TASK_NAME + "\"}}){select{id assignee priority}}}");
+        GraphQLQueryRequest query = new GraphQLQueryRequest("{TaskEntities(where:{name:{EQ: \"" + TASK_NAME + "\"}}){select{id assignee priority}}}");
 
         ResponseEntity<Result> entity = rest.postForEntity("/admin/graphql", new HttpEntity<>(query), Result.class);
 
@@ -73,7 +72,7 @@ public class ActivitiGraphQLControllerIT {
             .describedAs(result.getErrors().toString())
             .isTrue();
 
-        assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=5}]}}")
+        assertThat("{TaskEntities={select=[{id=1, assignee=assignee, priority=5}]}}")
             .isEqualTo(result.getData().toString());
 
     }
@@ -83,13 +82,13 @@ public class ActivitiGraphQLControllerIT {
         // @formatter:off
         GraphQLQueryRequest query = new GraphQLQueryRequest(
                 "query {"
-                + "ProcessInstances {"
+                + "ProcessInstanceEntities {"
                 + "    select {"
                 + "      id"
-                + "      tasks {"
+                + "      task {" // should be plural i.e. tasks
                 + "        id"
                 + "        name"
-                + "        variables {"
+                + "        variableEntities {" // should be simplified i.e. variables
                 + "          name"
                 + "          value"
                 + "        }"
@@ -111,12 +110,12 @@ public class ActivitiGraphQLControllerIT {
         assertThat(result.getErrors().isEmpty())
             .describedAs(result.getErrors().toString())
             .isTrue();
-        assertThat(((Map<String, Object>) result.getData()).get("ProcessInstances")).isNotNull();
+        assertThat(((Map<String, Object>) result.getData()).get("ProcessInstanceEntities")).isNotNull();
     }
 
     @Test
     public void testGraphqlArguments() throws JsonParseException, JsonMappingException, IOException {
-        GraphQLQueryRequest query = new GraphQLQueryRequest("query TasksQuery($name: String!) {Tasks(where:{name:{EQ: $name}}) {select{id assignee priority}}}");
+        GraphQLQueryRequest query = new GraphQLQueryRequest("query TasksQuery($name: String!) {TaskEntities(where:{name:{EQ: $name}}) {select{id assignee priority}}}");
 
         HashMap<String, Object> variables = new HashMap<>();
         variables.put("name", TASK_NAME);
@@ -136,7 +135,7 @@ public class ActivitiGraphQLControllerIT {
             .describedAs(result.getErrors().toString())
             .isTrue();
 
-        assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=5}]}}")
+        assertThat("{TaskEntities={select=[{id=1, assignee=assignee, priority=5}]}}")
             .isEqualTo(result.getData().toString());
     }
 }

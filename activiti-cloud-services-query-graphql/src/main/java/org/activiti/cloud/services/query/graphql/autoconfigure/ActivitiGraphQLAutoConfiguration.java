@@ -19,13 +19,17 @@ import javax.persistence.EntityManager;
 
 import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
 import com.introproventures.graphql.jpa.query.schema.GraphQLSchemaBuilder;
+import com.introproventures.graphql.jpa.query.schema.JavaScalars;
 import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaExecutor;
 import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaSchemaBuilder;
 import graphql.GraphQL;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.StaticDataFetcher;
+import org.activiti.cloud.services.query.graphql.scalar.GraphQLVariableValueCoercing;
 import org.activiti.cloud.services.query.graphql.web.ActivitiGraphQLController;
 import org.activiti.cloud.services.query.model.ProcessInstanceEntity;
+import org.activiti.cloud.services.query.model.VariableValue;
 import org.activiti.cloud.services.query.qraphql.ws.schema.GraphQLSubscriptionSchemaBuilder;
 import org.activiti.cloud.services.query.qraphql.ws.schema.GraphQLSubscriptionSchemaProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +57,7 @@ public class ActivitiGraphQLAutoConfiguration {
      */
     @Configuration
     @Import(ActivitiGraphQLController.class)
-    @EntityScan(basePackageClasses = ProcessInstance.class)
+    @EntityScan(basePackageClasses = ProcessInstanceEntity.class)
     public static class DefaultActivitiGraphQLJpaConfiguration implements ImportAware {
 
         @Autowired
@@ -70,6 +74,9 @@ public class ActivitiGraphQLAutoConfiguration {
             // Use NoOp DataFetcher for subscription schema fields via REST endpoint
             subscriptionSchemaBuilder.withSubscription(subscriptionProperties.getSubscriptionFieldName(),
                                                        new StaticDataFetcher(null));
+
+            new JavaScalars().register(VariableValue.class,
+                                       new GraphQLScalarType("VariableValue", "VariableValue type", new GraphQLVariableValueCoercing()));
 
             // Merge query and subscriptions schemas into one
             GraphQLSchema querySchema = GraphQLSchema

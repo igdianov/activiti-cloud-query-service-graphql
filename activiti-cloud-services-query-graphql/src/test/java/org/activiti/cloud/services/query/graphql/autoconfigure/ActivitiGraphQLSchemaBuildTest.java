@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaSchemaBuilder;
 import graphql.Scalars;
 import graphql.schema.GraphQLSchema;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ public class ActivitiGraphQLSchemaBuildTest {
     @EnableActivitiGraphQLQueryService
     static class TestConfiguration {
     }
-    
+
     @Test
     public void correctlyDerivesSchemaFromGivenEntities() {
         //when
@@ -55,39 +54,39 @@ public class ActivitiGraphQLSchemaBuildTest {
             .isNotNull();
 
         //then
-        assertThat(schema.getQueryType().getFieldDefinition("Task")
+        assertThat(schema.getQueryType().getFieldDefinition("TaskEntity")
             .getArgument("id"))
             .describedAs( "Ensure that identity can be queried on")
             .isNotNull();
 
         //then
-        assertThat(schema.getQueryType().getFieldDefinition("Task")
+        assertThat(schema.getQueryType().getFieldDefinition("TaskEntity")
             .getArguments())
             .describedAs("Ensure query has correct number of arguments")
             .hasSize(1);
-        
+
         //then
-        assertThat(schema.getQueryType().getFieldDefinition("ProcessInstance")
+        assertThat(schema.getQueryType().getFieldDefinition("ProcessInstanceEntity")
             .getArgument("id").getType())
             .isEqualTo(Scalars.GraphQLString);
 
         //then
-        assertThat(schema.getQueryType().getFieldDefinition("ProcessInstance")
+        assertThat(schema.getQueryType().getFieldDefinition("ProcessInstanceEntity")
             .getArguments())
             .describedAs("Ensure query has correct number of arguments")
             .hasSize(1);
-        
+
         //then
-        assertThat(schema.getQueryType().getFieldDefinition("Variable")
+        assertThat(schema.getQueryType().getFieldDefinition("VariableEntity")
             .getArgument("id").getType())
             .isEqualTo(Scalars.GraphQLLong);
 
         //then
-        assertThat(schema.getQueryType().getFieldDefinition("Variable")
+        assertThat(schema.getQueryType().getFieldDefinition("VariableEntity")
             .getArguments())
             .describedAs("Ensure query has correct number of arguments")
             .hasSize(1);
-        
+
     }
 
     @Test
@@ -101,32 +100,32 @@ public class ActivitiGraphQLSchemaBuildTest {
             .isNotNull();
 
         //then
-        assertThat(schema.getQueryType().getFieldDefinition("ProcessInstances")
+        assertThat(schema.getQueryType().getFieldDefinition("ProcessInstanceEntities")
             .getArgument("where"))
             .describedAs( "Ensure that collections can be queried")
             .isNotNull();
 
-        assertThat(schema.getQueryType().getFieldDefinition("ProcessInstances")
+        assertThat(schema.getQueryType().getFieldDefinition("ProcessInstanceEntities")
             .getArgument("page"))
             .describedAs( "Ensure that collections can be paged")
             .isNotNull();
-        
+
         //then
-        assertThat(schema.getQueryType().getFieldDefinition("Tasks")
+        assertThat(schema.getQueryType().getFieldDefinition("TaskEntities")
             .getArgument("page"))
             .describedAs( "Ensure that collections can be queried on by page")
             .isNotNull();
 
-        assertThat(schema.getQueryType().getFieldDefinition("Tasks")
+        assertThat(schema.getQueryType().getFieldDefinition("TaskEntities")
             .getArgument("page"))
             .describedAs( "Ensure that collections can be queried on by page")
             .isNotNull();
-        
+
         //then
-        assertThat(schema.getQueryType().getFieldDefinition("Tasks")
+        assertThat(schema.getQueryType().getFieldDefinition("TaskEntities")
             .getArguments())
             .describedAs("Ensure query has correct number of arguments")
             .hasSize(2);
     }
-    
+
 }
