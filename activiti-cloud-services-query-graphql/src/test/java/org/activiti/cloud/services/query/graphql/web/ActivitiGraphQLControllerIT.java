@@ -45,6 +45,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ActivitiGraphQLControllerIT {
 
     private static final String TASK_NAME = "task1";
+    private static final String GRPAPHQL_URL = "/admin/graphql";
 
     @Autowired
     private TestRestTemplate rest;
@@ -57,9 +58,9 @@ public class ActivitiGraphQLControllerIT {
 
     @Test
     public void testGraphql() {
-        GraphQLQueryRequest query = new GraphQLQueryRequest("{TaskEntities(where:{name:{EQ: \"" + TASK_NAME + "\"}}){select{id assignee priority}}}");
+        GraphQLQueryRequest query = new GraphQLQueryRequest("{Tasks(where:{name:{EQ: \"" + TASK_NAME + "\"}}){select{id assignee priority}}}");
 
-        ResponseEntity<Result> entity = rest.postForEntity("/admin/graphql", new HttpEntity<>(query), Result.class);
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
 
         assertThat(HttpStatus.OK)
             .describedAs(entity.toString())
@@ -72,7 +73,7 @@ public class ActivitiGraphQLControllerIT {
             .describedAs(result.getErrors().toString())
             .isTrue();
 
-        assertThat("{TaskEntities={select=[{id=1, assignee=assignee, priority=5}]}}")
+        assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=5}]}}")
             .isEqualTo(result.getData().toString());
 
     }
@@ -82,23 +83,27 @@ public class ActivitiGraphQLControllerIT {
         // @formatter:off
         GraphQLQueryRequest query = new GraphQLQueryRequest(
                 "query {"
-                + "ProcessInstanceEntities {"
+                + "ProcessInstances {"
                 + "    select {"
                 + "      id"
-                + "      task {" // should be plural i.e. tasks
+                + "      tasks {"
                 + "        id"
                 + "        name"
-                + "        variableEntities {" // should be simplified i.e. variables
+                + "        variables {"
                 + "          name"
                 + "          value"
                 + "        }"
+                + "      }"
+                + "      variables {"
+                + "        name"
+                + "        value"
                 + "      }"
                 + "    }"
                 + "  }"
                 + "}");
        // @formatter:on
 
-        ResponseEntity<Result> entity = rest.postForEntity("/admin/graphql", new HttpEntity<>(query), Result.class);
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
 
         assertThat(HttpStatus.OK)
             .describedAs(entity.toString())
@@ -110,19 +115,19 @@ public class ActivitiGraphQLControllerIT {
         assertThat(result.getErrors().isEmpty())
             .describedAs(result.getErrors().toString())
             .isTrue();
-        assertThat(((Map<String, Object>) result.getData()).get("ProcessInstanceEntities")).isNotNull();
+        assertThat(((Map<String, Object>) result.getData()).get("ProcessInstances")).isNotNull();
     }
 
     @Test
     public void testGraphqlArguments() throws JsonParseException, JsonMappingException, IOException {
-        GraphQLQueryRequest query = new GraphQLQueryRequest("query TasksQuery($name: String!) {TaskEntities(where:{name:{EQ: $name}}) {select{id assignee priority}}}");
+        GraphQLQueryRequest query = new GraphQLQueryRequest("query TasksQuery($name: String!) {Tasks(where:{name:{EQ: $name}}) {select{id assignee priority}}}");
 
         HashMap<String, Object> variables = new HashMap<>();
         variables.put("name", TASK_NAME);
 
         query.setVariables(variables);
 
-        ResponseEntity<Result> entity = rest.postForEntity("/admin/graphql", new HttpEntity<>(query), Result.class);
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
 
         assertThat(HttpStatus.OK)
             .describedAs(entity.toString())
@@ -135,7 +140,7 @@ public class ActivitiGraphQLControllerIT {
             .describedAs(result.getErrors().toString())
             .isTrue();
 
-        assertThat("{TaskEntities={select=[{id=1, assignee=assignee, priority=5}]}}")
+        assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=5}]}}")
             .isEqualTo(result.getData().toString());
     }
 }
