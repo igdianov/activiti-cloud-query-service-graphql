@@ -15,9 +15,8 @@
  */
 package org.activiti.cloud.services.query.qraphql.ws.config;
 
-import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
-import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaExecutor;
 import org.activiti.cloud.services.query.qraphql.ws.datafetcher.GraphQLStompRelayDataFetcherDestinationResolver;
+import org.activiti.cloud.services.query.qraphql.ws.datafetcher.GraphQLSubscriptionExecutor;
 import org.activiti.cloud.services.query.qraphql.ws.datafetcher.StompRelayDataFetcher;
 import org.activiti.cloud.services.query.qraphql.ws.datafetcher.StompRelayDestinationResolver;
 import org.activiti.cloud.services.query.qraphql.ws.datafetcher.StompRelayPublisherFactory;
@@ -57,11 +56,11 @@ public class GraphQLSubscriptionsSchemaAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public GraphQLExecutor graphQLExecutor(final GraphQLSubscriptionSchemaBuilder subscriptionSchemaBuilder,
+        public GraphQLSubscriptionExecutor graphQLSubscriptionExecutor(final GraphQLSubscriptionSchemaBuilder subscriptionSchemaBuilder,
                                                StompRelayDataFetcher stompRelayDataFetcher) {
             subscriptionSchemaBuilder.withSubscription(subscriptionProperties.getSubscriptionFieldName(), stompRelayDataFetcher);
 
-            return new GraphQLJpaExecutor(subscriptionSchemaBuilder.getGraphQLSchema());
+            return new GraphQLSubscriptionExecutor(subscriptionSchemaBuilder.getGraphQLSchema());
         }
     }
 

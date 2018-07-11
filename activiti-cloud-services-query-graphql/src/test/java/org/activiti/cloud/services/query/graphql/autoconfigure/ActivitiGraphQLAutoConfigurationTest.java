@@ -22,6 +22,7 @@ import com.introproventures.graphql.jpa.query.schema.GraphQLSchemaBuilder;
 import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaExecutor;
 import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaSchemaBuilder;
 import org.activiti.cloud.services.query.graphql.web.ActivitiGraphQLController;
+import org.activiti.cloud.services.query.qraphql.ws.datafetcher.GraphQLSubscriptionExecutor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ public class ActivitiGraphQLAutoConfigurationTest {
     private GraphQLExecutor graphQLExecutor;
 
     @Autowired
+    GraphQLSubscriptionExecutor graphQLSubscriptionExecutor;
+
+    @Autowired
     private GraphQLSchemaBuilder graphQLSchemaBuilder;
 
     @Autowired
@@ -53,6 +57,7 @@ public class ActivitiGraphQLAutoConfigurationTest {
     @Test
     public void contextIsAutoConfigured() {
         assertThat(graphQLExecutor).isInstanceOf(GraphQLJpaExecutor.class);
+        assertThat(graphQLSubscriptionExecutor).isInstanceOf(GraphQLSubscriptionExecutor.class);
         assertThat(graphQLSchemaBuilder).isInstanceOf(GraphQLJpaSchemaBuilder.class);
         assertThat(graphQLController).isNotNull();
         assertThat(graphQLProperties).isNotNull();

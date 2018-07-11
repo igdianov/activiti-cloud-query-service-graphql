@@ -33,12 +33,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportAware;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 
@@ -48,7 +46,6 @@ import org.springframework.util.Assert;
 @Configuration
 @ConditionalOnClass({GraphQL.class})
 @ConditionalOnProperty(name = "spring.activiti.cloud.services.query.graphql.enabled", matchIfMissing = true)
-@PropertySource("classpath:/org/activiti/cloud/services/query/graphql/default.properties")
 public class ActivitiGraphQLAutoConfiguration {
 
     /**
@@ -56,9 +53,7 @@ public class ActivitiGraphQLAutoConfiguration {
      */
     @Configuration
     @Import(ActivitiGraphQLController.class)
-    @EntityScan(basePackageClasses = ProcessInstanceEntity.class)
-    @EnableConfigurationProperties(ActivitiGraphQLSchemaProperties.class)
-    @ConditionalOnProperty(name = "spring.activiti.cloud.services.query.graphql.enabled", matchIfMissing = true)
+    @EntityScan(basePackageClasses = ProcessInstance.class)
     public static class DefaultActivitiGraphQLJpaConfiguration implements ImportAware {
 
         @Autowired
@@ -68,7 +63,6 @@ public class ActivitiGraphQLAutoConfiguration {
         private GraphQLSubscriptionSchemaProperties subscriptionProperties;
 
         @Bean
-        @ConditionalOnProperty(name = "spring.activiti.cloud.services.query.graphql.enabled", matchIfMissing = true)
         @ConditionalOnMissingBean(GraphQLExecutor.class)
         public GraphQLExecutor graphQLExecutor(final GraphQLSchemaBuilder querySchemaBuilder,
                                                final GraphQLSubscriptionSchemaBuilder subscriptionSchemaBuilder) {
@@ -87,7 +81,6 @@ public class ActivitiGraphQLAutoConfiguration {
         }
 
         @Bean
-        @ConditionalOnProperty(name = "spring.activiti.cloud.services.query.graphql.enabled", matchIfMissing = true)
         @ConditionalOnMissingBean(GraphQLSchemaBuilder.class)
         public GraphQLSchemaBuilder graphQLSchemaBuilder(final EntityManager entityManager) {
             Assert.notNull(properties.getName(),
