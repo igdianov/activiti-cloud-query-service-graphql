@@ -45,6 +45,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ActivitiGraphQLControllerIT {
 
     private static final String TASK_NAME = "task1";
+    private static final String GRPAPHQL_URL = "/admin/graphql";
 
     @Autowired
     private TestRestTemplate rest;
@@ -59,7 +60,7 @@ public class ActivitiGraphQLControllerIT {
     public void testGraphql() {
         GraphQLQueryRequest query = new GraphQLQueryRequest("{Tasks(where:{name:{EQ: \"" + TASK_NAME + "\"}}){select{id assignee priority}}}");
 
-        ResponseEntity<Result> entity = rest.postForEntity("/admin/graphql", new HttpEntity<>(query), Result.class);
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
 
         assertThat(HttpStatus.OK)
             .describedAs(entity.toString())
@@ -72,7 +73,7 @@ public class ActivitiGraphQLControllerIT {
             .describedAs(result.getErrors().toString())
             .isTrue();
 
-        assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=Normal}]}}")
+        assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=5}]}}")
             .isEqualTo(result.getData().toString());
 
     }
@@ -93,12 +94,16 @@ public class ActivitiGraphQLControllerIT {
                 + "          value"
                 + "        }"
                 + "      }"
+                + "      variables {"
+                + "        name"
+                + "        value"
+                + "      }"
                 + "    }"
                 + "  }"
                 + "}");
        // @formatter:on
 
-        ResponseEntity<Result> entity = rest.postForEntity("/admin/graphql", new HttpEntity<>(query), Result.class);
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
 
         assertThat(HttpStatus.OK)
             .describedAs(entity.toString())
@@ -122,7 +127,7 @@ public class ActivitiGraphQLControllerIT {
 
         query.setVariables(variables);
 
-        ResponseEntity<Result> entity = rest.postForEntity("/admin/graphql", new HttpEntity<>(query), Result.class);
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
 
         assertThat(HttpStatus.OK)
             .describedAs(entity.toString())
@@ -135,7 +140,7 @@ public class ActivitiGraphQLControllerIT {
             .describedAs(result.getErrors().toString())
             .isTrue();
 
-        assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=Normal}]}}")
+        assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=5}]}}")
             .isEqualTo(result.getData().toString());
     }
 }

@@ -42,7 +42,7 @@ public class ActivitiGraphQLSchemaBuildTest {
     @EnableActivitiGraphQLQueryService
     static class TestConfiguration {
     }
-    
+
     @Test
     public void correctlyDerivesSchemaFromGivenEntities() {
         //when
@@ -64,7 +64,7 @@ public class ActivitiGraphQLSchemaBuildTest {
             .getArguments())
             .describedAs("Ensure query has correct number of arguments")
             .hasSize(1);
-        
+
         //then
         assertThat(schema.getQueryType().getFieldDefinition("ProcessInstance")
             .getArgument("id").getType())
@@ -75,7 +75,7 @@ public class ActivitiGraphQLSchemaBuildTest {
             .getArguments())
             .describedAs("Ensure query has correct number of arguments")
             .hasSize(1);
-        
+
         //then
         assertThat(schema.getQueryType().getFieldDefinition("Variable")
             .getArgument("id").getType())
@@ -86,7 +86,7 @@ public class ActivitiGraphQLSchemaBuildTest {
             .getArguments())
             .describedAs("Ensure query has correct number of arguments")
             .hasSize(1);
-        
+
     }
 
     @Test
@@ -99,7 +99,6 @@ public class ActivitiGraphQLSchemaBuildTest {
             .describedAs("Ensure the result is returned")
             .isNotNull();
 
-        //then
         assertThat(schema.getQueryType().getFieldDefinition("ProcessInstances")
             .getArgument("where"))
             .describedAs( "Ensure that collections can be queried")
@@ -109,8 +108,7 @@ public class ActivitiGraphQLSchemaBuildTest {
             .getArgument("page"))
             .describedAs( "Ensure that collections can be paged")
             .isNotNull();
-        
-        //then
+
         assertThat(schema.getQueryType().getFieldDefinition("Tasks")
             .getArgument("page"))
             .describedAs( "Ensure that collections can be queried on by page")
@@ -120,12 +118,21 @@ public class ActivitiGraphQLSchemaBuildTest {
             .getArgument("page"))
             .describedAs( "Ensure that collections can be queried on by page")
             .isNotNull();
-        
-        //then
+
         assertThat(schema.getQueryType().getFieldDefinition("Tasks")
             .getArguments())
             .describedAs("Ensure query has correct number of arguments")
             .hasSize(2);
+
+        assertThat(schema.getQueryType().getFieldDefinition("Variables")
+           .getArgument("page"))
+           .describedAs( "Ensure that collections can be queried on by page")
+           .isNotNull();
+
+       assertThat(schema.getQueryType().getFieldDefinition("Variables")
+           .getArguments())
+           .describedAs("Ensure query has correct number of arguments")
+           .hasSize(2);
     }
-    
+
 }
