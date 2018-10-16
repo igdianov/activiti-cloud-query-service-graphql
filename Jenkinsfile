@@ -1,6 +1,5 @@
 pipeline {
-	label 
-
+	
     agent {
       label "jenkins-maven"
 /*
