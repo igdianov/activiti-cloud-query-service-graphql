@@ -85,7 +85,7 @@ spec:
       }
     }
     post {
-        success {
+        always {
             cleanWs()
         }
 /*
