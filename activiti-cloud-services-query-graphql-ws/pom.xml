@@ -71,10 +71,6 @@
       <artifactId>jackson-databind</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.introproventures</groupId>
-      <artifactId>graphql-jpa-query-schema</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.graphql-java</groupId>
       <artifactId>graphql-java</artifactId>
     </dependency>
