@@ -2,7 +2,7 @@ CURRENT=$(pwd)
 NAME := $(APP_NAME)
 OS := $(shell uname)
 
-RELEASE_BRANCH := master
+RELEASE_BRANCH := develop
 RELEASE_VERSION := $(shell cat VERSION)
 RELEASE_ARTIFACT := $(ORG):$(APP_NAME)
 RELEASE_GREP_EXPR := '^[Rr]elease'

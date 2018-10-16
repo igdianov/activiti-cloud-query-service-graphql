@@ -49,7 +49,7 @@ spec:
       }
       stage('Build Release') {
         when {
-          branch 'master'
+          branch 'develop'
         }
         steps {
           container('maven') {
@@ -72,7 +72,7 @@ spec:
       }
       stage('Update Versions') {
         when {
-          branch 'master'
+          branch 'develop'
         }
         steps {
           container('maven') {
