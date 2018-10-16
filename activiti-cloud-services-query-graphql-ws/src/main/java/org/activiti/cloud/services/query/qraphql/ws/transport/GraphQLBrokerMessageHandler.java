@@ -24,8 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
-import graphql.ExecutionResult;
 import org.activiti.cloud.services.query.qraphql.ws.util.QueryParameters;
 import org.reactivestreams.Publisher;
 import org.springframework.context.event.EventListener;
@@ -42,6 +40,10 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.messaging.support.MessageHeaderInitializer;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.util.Assert;
+
+import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
+
+import graphql.ExecutionResult;
 
 public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
 
@@ -429,7 +431,7 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
 		getClientOutboundChannel().send(message);
 	}
 
-	private static class SessionInfo {
+	protected static class SessionInfo {
 
 		/* receiver SHOULD take into account an error margin */
 		private static final long HEARTBEAT_MULTIPLIER = 3;
