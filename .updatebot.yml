@@ -1,0 +1,8 @@
+github:
+  organisations:
+  - name: igdianov
+    repositories:
+    - name: activiti-cloud-query-graphql-notifications
+    - name: activiti-cloud-query-graphql-ws
+    - name: activiti-cloud-query-graphql-query
+      
