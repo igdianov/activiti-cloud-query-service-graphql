@@ -10,10 +10,11 @@
   </parent>
   <artifactId>activiti-cloud-query-service-graphql-parent</artifactId>
   <name>Activiti Cloud Query :: GraphQL Parent</name>
-  <version>7.0.0.Beta1</version>
+  <version>7.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <url>http://activiti.org</url>
   <modules>
+    <module>activiti-cloud-services-query-graphql-dependencies</module>
     <module>activiti-cloud-services-query-graphiql</module>
     <module>activiti-cloud-services-query-graphql-ws-schema</module>
     <module>activiti-cloud-services-query-graphql-ws-security</module>

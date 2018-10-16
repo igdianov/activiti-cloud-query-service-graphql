@@ -4,8 +4,9 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.activiti.cloud</groupId>
-    <artifactId>activiti-cloud-query-service-graphql-parent</artifactId>
-    <version>7.0.0.Beta1</version>
+    <artifactId>activiti-cloud-services-query-graphql-dependencies</artifactId>
+    <version>7.0.0-SNAPSHOT</version>
+    <relativePath>../activiti-cloud-services-query-graphql-dependencies</relativePath>
   </parent>
   <artifactId>activiti-cloud-services-query-graphql-ws</artifactId>
   <name>Activiti Cloud Query :: Services :: Query GraphQL WebSockets</name>
