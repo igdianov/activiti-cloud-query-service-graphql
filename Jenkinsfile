@@ -59,7 +59,7 @@ spec:
             sh "make version"
             
             // Let's test first
-            sh "make verify"
+            sh "make install"
 
             // Let's make tag in Git
             sh "make tag"
