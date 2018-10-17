@@ -50,7 +50,7 @@ public class NotificationsConsumerChannelHandler extends NotificationsGatewaySup
     @StreamListener(NotificationsGatewayChannels.NOTIFICATIONS_CONSUMER)
     public synchronized void receive(List<Map<String,Object>> events) throws JsonProcessingException {
 
-        LOGGER.info("Received events {}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(events));
+        LOGGER.info("Received events: {}", new ObjectMapper().writeValueAsString(events));
     	
         List<ProcessEngineNotification> notifications = transformer.transform(events);
 
