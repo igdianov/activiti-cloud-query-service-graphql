@@ -45,7 +45,7 @@ type ProcessEngineNotification {
 	TASK_CANDIDATE_GROUP_REMOVED: [TASK_CANDIDATE_GROUP_REMOVED]
 }
 
-type ProcessInstance {
+type ProcessInstanceType {
 	id : String
 	name : String
 	description : String
@@ -68,7 +68,7 @@ type PROCESS_RESUMED {
     
     id : String
     timestamp : Long
-    entity : ProcessInstance
+    entity : ProcessInstanceType
     eventType : String
 }
 
@@ -83,7 +83,7 @@ type PROCESS_SUSPENDED {
     
     id : String
     timestamp : Long
-    entity : ProcessInstance
+    entity : ProcessInstanceType
     eventType : String
 }
 
@@ -98,7 +98,7 @@ type PROCESS_STARTED {
 
     id : String
     timestamp : Long
-    entity : ProcessInstance
+    entity : ProcessInstanceType
     eventType : String
     
     nestedProcessDefinitionId : String
@@ -116,7 +116,7 @@ type PROCESS_COMPLETED {
 
     id : String
     timestamp : Long
-    entity : ProcessInstance
+    entity : ProcessInstanceType
     eventType : String
 }
 
@@ -131,7 +131,7 @@ type PROCESS_CREATED {
 
     id : String
     timestamp : Long
-    entity : ProcessInstance
+    entity : ProcessInstanceType
     eventType : String
 }
 
@@ -146,13 +146,13 @@ type PROCESS_CANCELLED {
 
     id : String
     timestamp : Long
-    entity : ProcessInstance
+    entity : ProcessInstanceType
     eventType : String
 
     cause: String
 }
 
-type BPMNActivity {
+type BPMNActivityType {
     processInstanceId : String
     pocessDefinitionId : String
     activityName : String
@@ -171,7 +171,7 @@ type ACTIVITY_COMPLETED {
 
     id : String
     timestamp : Long
-    entity : BPMNActivity
+    entity : BPMNActivityType
     eventType : String
 }
 
@@ -186,7 +186,7 @@ type ACTIVITY_STARTED {
 
     id : String
     timestamp : Long
-    entity : BPMNActivity
+    entity : BPMNActivityType
     eventType : String
 }
 
@@ -201,7 +201,7 @@ type ACTIVITY_CANCELLED {
 
     id : String
     timestamp : Long
-    entity : BPMNActivity
+    entity : BPMNActivityType
     eventType : String
 
     cause: String
@@ -263,7 +263,7 @@ type VARIABLE_UPDATED {
 }
 
 
-type SequenceFlow {
+type SequenceFlowType {
     processInstanceId : String
     processDefinitionId : String
     sourceActivityElementId : String
@@ -285,11 +285,11 @@ type SEQUENCE_FLOW_TAKEN {
 
     id : String
     timestamp : Long
-    entity : SequenceFlow
+    entity : SequenceFlowType
     eventType : String
 }
 
-type Task {
+type TaskType {
     id : String
     owner : String
     assignee : String
@@ -316,7 +316,7 @@ type TASK_CREATED {
 
     id : String
     timestamp : Long
-    entity : Task
+    entity : TaskType
     eventType : String
 }
 
@@ -331,7 +331,7 @@ type TASK_SUSPENDED {
 
     id : String
     timestamp : Long
-    entity : Task
+    entity : TaskType
     eventType : String
 }
 
@@ -346,7 +346,7 @@ type TASK_STARTED {
 
     id : String
     timestamp : Long
-    entity : Task
+    entity : TaskType
     eventType : String
 }
 
@@ -361,7 +361,7 @@ type TASK_ACTIVATED {
 
     id : String
     timestamp : Long
-    entity : Task
+    entity : TaskType
     eventType : String
 }
 
@@ -376,7 +376,7 @@ type TASK_ASSIGNED {
 
     id : String
     timestamp : Long
-    entity : Task
+    entity : TaskType
     eventType : String
 }
 
@@ -391,7 +391,7 @@ type TASK_COMPLETED {
 
     id : String
     timestamp : Long
-    entity : Task
+    entity : TaskType
     eventType : String
 }
 
@@ -406,14 +406,14 @@ type TASK_CANCELLED {
 
     id : String
     timestamp : Long
-    entity : Task
+    entity : TaskType
     eventType : String
     
     cause: String
 }
 
 
-type IntegrationContext {
+type IntegrationContextType {
     id : String
     processInstanceId : String
     processDefinitionId : String
@@ -435,7 +435,7 @@ type INTEGRATION_REQUESTED {
 
     id : String
     timestamp : Long
-    entity : IntegrationContext
+    entity : IntegrationContextType
     eventType : String
 }
 
@@ -450,11 +450,11 @@ type INTEGRATION_RESULT_RECEIVED {
 
     id : String
     timestamp : Long
-    entity : IntegrationContext
+    entity : IntegrationContextType
     eventType : String
 }
 
-type TaskCandidateUser {
+type TaskCandidateUserType {
     taskId : String
     userId : String
 }
@@ -470,7 +470,7 @@ type TASK_CANDIDATE_USER_ADDED {
 
     id : String
     timestamp : Long
-    entity : TaskCandidateUser
+    entity : TaskCandidateUserType
     eventType : String
 }
 
@@ -485,12 +485,12 @@ type TASK_CANDIDATE_USER_REMOVED {
 
     id : String
     timestamp : Long
-    entity : TaskCandidateUser
+    entity : TaskCandidateUserType
     eventType : String
 }
 
 
-type TaskCandidateGroup {
+type TaskCandidateGroupType {
     taskId : String
     groupId : String
 }
@@ -506,7 +506,7 @@ type TASK_CANDIDATE_GROUP_ADDED {
 
     id : String
     timestamp : Long
-    entity : TaskCandidateGroup
+    entity : TaskCandidateGroupType
     eventType : String
 }
 
@@ -521,7 +521,7 @@ type TASK_CANDIDATE_GROUP_REMOVED {
 
     id : String
     timestamp : Long
-    entity : TaskCandidateGroup
+    entity : TaskCandidateGroupType
     eventType : String
 }
 
