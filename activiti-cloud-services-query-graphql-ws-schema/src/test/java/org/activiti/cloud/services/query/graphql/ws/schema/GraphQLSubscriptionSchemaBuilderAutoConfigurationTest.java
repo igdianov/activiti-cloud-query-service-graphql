@@ -52,7 +52,7 @@ public class GraphQLSubscriptionSchemaBuilderAutoConfigurationTest {
     public void testGraphQLSubscriptionSchemaProperties() {
         assertThat(properties.getGraphqls()).isEqualTo("classpath:activiti.graphqls");
         assertThat(properties.getSubscriptionFieldName()).isEqualTo("ProcessEngineNotification");
-        assertThat(properties.getSubscriptionArgumentNames()).isEqualTo(new String[]{"serviceName", "appName", "processDefinitionId", "processInstanceId"});
+        assertThat(properties.getSubscriptionArgumentNames()).isEqualTo(new String[]{"serviceName", "appName"});
     }
 
 }
