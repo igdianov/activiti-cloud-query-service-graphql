@@ -116,16 +116,16 @@ public class GraphQLProcessEngineNotificationTransformerTest {
         // then
         assertThat(notifications).hasSize(2);
 
-        assertThat(notifications.get(0).get("serviceName")).isEqualTo("rb");
-        assertThat(notifications.get(0).keySet())
-                .containsOnly("serviceName","appName","entityId","type1","type2");
-        assertThat(notifications.get(0).get("type2")).asList().hasSize(2);
-
-
-        assertThat(notifications.get(1).get("serviceName")).isEqualTo("rb1");
+        assertThat(notifications.get(1).get("serviceName")).isEqualTo("rb");
         assertThat(notifications.get(1).keySet())
-                .containsOnly("serviceName","appName","entityId","type1");
-        assertThat(notifications.get(1).get("type1")).asList().hasSize(1);
+                .containsOnly("serviceName","appName","type1","type2");
+        assertThat(notifications.get(1).get("type2")).asList().hasSize(2);
+
+
+        assertThat(notifications.get(0).get("serviceName")).isEqualTo("rb1");
+        assertThat(notifications.get(0).keySet())
+                .containsOnly("serviceName","appName","type1");
+        assertThat(notifications.get(0).get("type1")).asList().hasSize(1);
 
     }
 
@@ -189,15 +189,15 @@ public class GraphQLProcessEngineNotificationTransformerTest {
         // then
         assertThat(notifications).hasSize(2);
 
-        assertThat(notifications.get(0).get("serviceName")).isEqualTo("rb");
-        assertThat(notifications.get(0).keySet())
-                .containsOnly("serviceName","appName","entityId","type2");
-        assertThat(notifications.get(0).get("type2")).asList().hasSize(2);
-
-        assertThat(notifications.get(1).get("serviceName")).isEqualTo("rb1");
+        assertThat(notifications.get(1).get("serviceName")).isEqualTo("rb");
         assertThat(notifications.get(1).keySet())
-                .containsOnly("serviceName","appName","entityId","type1");
-        assertThat(notifications.get(1).get("type1")).asList().hasSize(1);
+                .containsOnly("serviceName","appName","type2");
+        assertThat(notifications.get(1).get("type2")).asList().hasSize(2);
+
+        assertThat(notifications.get(0).get("serviceName")).isEqualTo("rb1");
+        assertThat(notifications.get(0).keySet())
+                .containsOnly("serviceName","appName","type1");
+        assertThat(notifications.get(0).get("type1")).asList().hasSize(1);
 
 
     }
@@ -260,7 +260,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
         assertThat(notifications).hasSize(1);
         assertThat(notifications.get(0).get("serviceName")).isEqualTo("rb");
         assertThat(notifications.get(0).keySet())
-            .containsOnly("serviceName","appName","entityId","type2");
+            .containsOnly("serviceName","appName","type2");
         assertThat(notifications.get(0).get("type2")).asList().hasSize(2);
 
     }
@@ -291,8 +291,8 @@ public class GraphQLProcessEngineNotificationTransformerTest {
         LOGGER.info("\n{}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(notifications));
 
         // then
-        assertThat(notifications).hasSize(6);
-        assertThat(notifications.get(0)).hasSize(4);
+        assertThat(notifications).hasSize(1);
+        assertThat(notifications.get(0)).hasSize(10);
         
     	
     }

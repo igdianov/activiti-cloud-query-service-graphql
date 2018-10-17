@@ -11,13 +11,12 @@ type Query {
 }
 
 type Subscription {
-    ProcessEngineNotification(serviceName : String, appName : String, entityId : String) : ProcessEngineNotification
+    ProcessEngineNotification(serviceName : String, appName : String) : ProcessEngineNotification
 }
 
 type ProcessEngineNotification {
 	serviceName : String
 	appName : String 
-	entityId : String
 	PROCESS_STARTED : [PROCESS_STARTED]
 	PROCESS_COMPLETED : [PROCESS_COMPLETED]
 	PROCESS_CREATED : [PROCESS_CREATED]
