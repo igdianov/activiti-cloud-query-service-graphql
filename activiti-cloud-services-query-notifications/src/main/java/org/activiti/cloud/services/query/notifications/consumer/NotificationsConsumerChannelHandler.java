@@ -19,8 +19,6 @@ package org.activiti.cloud.services.query.notifications.consumer;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.activiti.cloud.services.query.notifications.NotificationsGateway;
 import org.activiti.cloud.services.query.notifications.NotificationsGatewaySupport;
 import org.activiti.cloud.services.query.notifications.RoutingKeyResolver;
@@ -29,6 +27,9 @@ import org.activiti.cloud.services.query.notifications.model.ProcessEngineNotifi
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.StreamListener;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class NotificationsConsumerChannelHandler extends NotificationsGatewaySupport {
 
@@ -49,6 +50,8 @@ public class NotificationsConsumerChannelHandler extends NotificationsGatewaySup
     @StreamListener(NotificationsGatewayChannels.NOTIFICATIONS_CONSUMER)
     public synchronized void receive(List<Map<String,Object>> events) throws JsonProcessingException {
 
+        LOGGER.info("Received events {}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(events));
+    	
         List<ProcessEngineNotification> notifications = transformer.transform(events);
 
         if(LOGGER.isDebugEnabled())
