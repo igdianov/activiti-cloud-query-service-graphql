@@ -22,7 +22,7 @@ import com.introproventures.graphql.jpa.query.schema.GraphQLSchemaBuilder;
 import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaExecutor;
 import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaSchemaBuilder;
 import org.activiti.cloud.services.query.graphql.web.ActivitiGraphQLController;
-import org.activiti.cloud.services.query.qraphql.ws.datafetcher.GraphQLSubscriptionExecutor;
+import org.activiti.cloud.services.query.graphql.ws.datafetcher.GraphQLSubscriptionExecutor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
