@@ -81,7 +81,7 @@ public class ActivitiGraphQLController {
     @PostMapping(value = PATH,
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ExecutionResult postJson(@RequestBody @Valid final GraphQLQueryRequest queryRequest) throws IOException {
+    public ExecutionResult executePostJsonRequest(@RequestBody @Valid final GraphQLQueryRequest queryRequest) throws IOException {
         return graphQLExecutor.execute(queryRequest.getQuery(),
                                        queryRequest.getVariables());
     }
@@ -101,7 +101,7 @@ public class ActivitiGraphQLController {
     @GetMapping(value = PATH,
             consumes = {APPLICATION_GRAPHQL_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ExecutionResult getQuery(
+    public ExecutionResult executeGetQueryRequest(
             @RequestParam(name = "query") final String query,
             @RequestParam(name = "variables", required = false) final String variables) throws IOException {
         Map<String, Object> variablesMap = variablesStringToMap(variables);
@@ -124,7 +124,7 @@ public class ActivitiGraphQLController {
     @PostMapping(value = PATH,
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ExecutionResult postForm(
+    public ExecutionResult executePostFormRequest(
             @RequestParam(name = "query") final String query,
             @RequestParam(name = "variables", required = false) final String variables) throws IOException {
         Map<String, Object> variablesMap = variablesStringToMap(variables);
@@ -143,7 +143,7 @@ public class ActivitiGraphQLController {
     @PostMapping(value = PATH,
             consumes = APPLICATION_GRAPHQL_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ExecutionResult postApplicationGraphQL(
+    public ExecutionResult executePostApplicationGraphQL(
             @RequestBody final String query) throws IOException {
         return graphQLExecutor.execute(query,
                                        null);
