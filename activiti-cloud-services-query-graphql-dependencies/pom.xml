@@ -9,9 +9,18 @@
 	</parent>
 	<artifactId>activiti-cloud-services-query-graphql-dependencies</artifactId>
 	<packaging>pom</packaging>
+	
+	<properties>
+		<metrics-annotation.version>3.2.6</metrics-annotation.version>
+	</properties>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>io.dropwizard.metrics</groupId>
+				<artifactId>metrics-annotation</artifactId>
+				<version>${metrics-annotation.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.activiti.cloud</groupId>
 				<artifactId>activiti-cloud-services-query-graphiql</artifactId>
