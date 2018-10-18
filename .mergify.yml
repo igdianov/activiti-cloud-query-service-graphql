@@ -1,9 +1,10 @@
-rules:
-  default:
-    protection:
-      required_pull_request_reviews: 
-        required_approving_review_count: 0
-      required_status_checks:
+pull_request_rules:
+  - name: automatic merge with strict
+    conditions:
+      - author=introproventures-jenkins-x
+      - status-success=continuous-integration/jenkins/pr-head
+    actions:
+      delete_head_branch: {}
+      merge:
+        method: merge
         strict: true
-        contexts:
-          - continuous-integration/jenkins/pr-head
