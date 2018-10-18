@@ -22,10 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import graphql.ExecutionResult;
-import graphql.GraphQLError;
 import org.activiti.cloud.services.query.graphql.autoconfigure.EnableActivitiGraphQLQueryService;
 import org.activiti.cloud.services.query.graphql.web.ActivitiGraphQLController.GraphQLQueryRequest;
 import org.junit.Test;
@@ -39,6 +35,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import graphql.ExecutionResult;
+import graphql.GraphQLError;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -76,6 +78,44 @@ public class ActivitiGraphQLControllerIT {
         assertThat("{Tasks={select=[{id=1, assignee=assignee, priority=5}]}}")
             .isEqualTo(result.getData().toString());
 
+    }
+
+    @Test
+    public void testGraphqlWhere() {
+        // @formatter:off
+        GraphQLQueryRequest query = new GraphQLQueryRequest(
+        	    "query {" +
+        	    "	  ProcessInstances(page: {start: 1, limit: 10}," + 
+        	    "	    where: {status : {EQ: COMPLETED }}) {" +
+        	    "	    pages" +
+        	    "	    total" +
+        	    "	    select {" +
+        	    "	      id" +
+        	    "	      processDefinitionId" +
+        	    "	      processDefinitionKey" +
+        	    "	      status" +
+        	    "	      tasks {" +
+        	    "	        name" +
+        	    "	        status" +
+        	    "	      }" +
+        	    "	    }" +
+        	    "	  }" +
+        	    "	}");
+       // @formatter:on
+
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
+
+        assertThat(HttpStatus.OK)
+            .describedAs(entity.toString())
+            .isEqualTo(entity.getStatusCode());
+
+        Result result = entity.getBody();
+
+        assertThat(result).isNotNull();
+        assertThat(result.getErrors().isEmpty())
+            .describedAs(result.getErrors().toString())
+            .isTrue();
+        assertThat(((Map<String, Object>) result.getData()).get("ProcessInstances")).isNotNull();
     }
 
     @Test

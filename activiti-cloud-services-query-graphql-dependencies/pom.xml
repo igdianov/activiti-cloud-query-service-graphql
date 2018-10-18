@@ -12,10 +12,16 @@
 	
 	<properties>
 		<metrics-annotation.version>3.2.6</metrics-annotation.version>
+		<graphql-jpa-query.version>0.3.6</graphql-jpa-query.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>com.introproventures</groupId>
+				<artifactId>graphql-jpa-query-schema</artifactId>
+				<version>${graphql-jpa-query.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>io.dropwizard.metrics</groupId>
 				<artifactId>metrics-annotation</artifactId>
