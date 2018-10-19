@@ -15,13 +15,13 @@
   <url>http://activiti.org</url>
   <modules>
     <module>activiti-cloud-services-query-graphql-dependencies</module>
-    <module>activiti-cloud-services-query-graphiql</module>
+    <module>activiti-cloud-services-query-graphql-graphiql</module>
     <module>activiti-cloud-services-query-graphql-ws-schema</module>
     <module>activiti-cloud-services-query-graphql-ws-security</module>
     <module>activiti-cloud-services-query-graphql-ws</module>
-    <module>activiti-cloud-services-query-graphql</module>
-    <module>activiti-cloud-services-query-notifications</module>
-    <module>activiti-cloud-services-query-stomp</module>
+    <module>activiti-cloud-services-query-graphql-web</module>
+    <module>activiti-cloud-services-query-graphql-notifications</module>
+    <module>activiti-cloud-services-query-graphql-stomp</module>
   </modules>
   <scm>
     <url>https://github.com/Activiti/activiti-cloud-query-service</url>

@@ -29,7 +29,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.activiti.cloud</groupId>
-				<artifactId>activiti-cloud-services-query-graphiql</artifactId>
+				<artifactId>activiti-cloud-services-query-graphql-graphiql</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -49,22 +49,17 @@
 			</dependency>
 			<dependency>
 				<groupId>org.activiti.cloud</groupId>
-				<artifactId>activiti-cloud-services-query-graphql</artifactId>
+				<artifactId>activiti-cloud-services-query-graphql-web</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.activiti.cloud</groupId>
-				<artifactId>activiti-cloud-services-query-notifications</artifactId>
+				<artifactId>activiti-cloud-services-query-graphql-notifications</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.activiti.cloud</groupId>
-				<artifactId>activiti-cloud-services-query-stomp</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.activiti.cloud</groupId>
-				<artifactId>activiti-cloud-services-query-graphql-dependencies</artifactId>
+				<artifactId>activiti-cloud-services-query-graphql-stomp</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
