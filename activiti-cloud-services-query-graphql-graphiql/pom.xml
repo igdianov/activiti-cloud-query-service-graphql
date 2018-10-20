@@ -12,6 +12,4 @@
 	<artifactId>activiti-cloud-services-query-graphql-graphiql</artifactId>
 	<name>Activiti Cloud Query :: Services :: Query GraphQL GraphiQL Client</name>
 
-	<dependencies>
-	</dependencies>
 </project>
