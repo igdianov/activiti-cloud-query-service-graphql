@@ -17,12 +17,7 @@ package org.activiti.cloud.services.query.graphql.autoconfigure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
-import com.introproventures.graphql.jpa.query.schema.GraphQLSchemaBuilder;
-import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaExecutor;
-import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaSchemaBuilder;
 import org.activiti.cloud.services.query.graphql.web.ActivitiGraphQLController;
-import org.activiti.cloud.services.query.graphql.ws.datafetcher.GraphQLSubscriptionExecutor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +25,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
+import com.introproventures.graphql.jpa.query.schema.GraphQLSchemaBuilder;
+import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaExecutor;
+import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaSchemaBuilder;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -40,9 +40,6 @@ public class ActivitiGraphQLAutoConfigurationTest {
 
     @Autowired
     private GraphQLExecutor graphQLExecutor;
-
-    @Autowired
-    GraphQLSubscriptionExecutor graphQLSubscriptionExecutor;
 
     @Autowired
     private GraphQLSchemaBuilder graphQLSchemaBuilder;
@@ -57,7 +54,6 @@ public class ActivitiGraphQLAutoConfigurationTest {
     @Test
     public void contextIsAutoConfigured() {
         assertThat(graphQLExecutor).isInstanceOf(GraphQLJpaExecutor.class);
-        assertThat(graphQLSubscriptionExecutor).isInstanceOf(GraphQLSubscriptionExecutor.class);
         assertThat(graphQLSchemaBuilder).isInstanceOf(GraphQLJpaSchemaBuilder.class);
         assertThat(graphQLController).isNotNull();
         assertThat(graphQLProperties).isNotNull();
