@@ -1,5 +1,9 @@
 package org.activiti.cloud.services.query.graphql.scalar;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import graphql.language.ArrayValue;
@@ -14,7 +18,7 @@ import graphql.language.StringValue;
 import graphql.language.Value;
 import graphql.schema.Coercing;
 
-public class GraphQLVariableValueCoercing implements Coercing<Object, Object> {
+public class JsonScalar implements Coercing<Object, Object> {
 
     @Override
     public Object serialize(Object dataFetcherResult) {
@@ -28,11 +32,17 @@ public class GraphQLVariableValueCoercing implements Coercing<Object, Object> {
 
     @Override
     public Object parseLiteral(Object input) {
-        return parseFieldValue((Value) input);
+        return parseFieldValue((Value) input,  Collections.emptyMap());
     }
 
     //recursively parse the input into a Map
-    private Object parseFieldValue(Value value) {
+    private Object parseFieldValue(Object value, Map<String, Object> variables) {
+        if (!(value instanceof Value)) {
+            throw new IllegalArgumentException(
+                    "Expected AST type 'StringValue' but was '" + value + "'."
+            );
+        }    	
+    	
         if (value instanceof StringValue) {
             return ((StringValue) value).getValue();
         }
@@ -52,14 +62,22 @@ public class GraphQLVariableValueCoercing implements Coercing<Object, Object> {
             return null;
         }
         if (value instanceof ArrayValue) {
-            return ((ArrayValue) value).getValues().stream()
-                    .map(this::parseFieldValue)
+        	List<Value> values = ((ArrayValue) value).getValues();
+            return values.stream()
+                    .map(v -> parseFieldValue(v, variables))
                     .collect(Collectors.toList());
         }
         if (value instanceof ObjectValue) {
-            return ((ObjectValue) value).getObjectFields().stream()
-                    .collect(Collectors.toMap(ObjectField::getName, field -> parseFieldValue(field.getValue())));
+        	List<ObjectField> values = ((ObjectValue) value).getObjectFields();
+            Map<String, Object> parsedValues = new LinkedHashMap<>();
+            
+            values.forEach(field -> {
+                Object parsedValue = parseFieldValue(field.getValue(), variables);
+                parsedValues.put(field.getName(), parsedValue);
+            });
+            return parsedValues;
         }
+        
         //Should never happen, as it would mean the variable was not replaced by the parser
         throw new IllegalArgumentException("Unsupported scalar value type: " + value.getClass().getName());
     }

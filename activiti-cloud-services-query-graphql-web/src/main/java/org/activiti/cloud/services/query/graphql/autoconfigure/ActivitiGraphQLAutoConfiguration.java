@@ -17,16 +17,7 @@ package org.activiti.cloud.services.query.graphql.autoconfigure;
 
 import javax.persistence.EntityManager;
 
-import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
-import com.introproventures.graphql.jpa.query.schema.GraphQLSchemaBuilder;
-import com.introproventures.graphql.jpa.query.schema.JavaScalars;
-import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaExecutor;
-import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaSchemaBuilder;
-import graphql.GraphQL;
-import graphql.schema.GraphQLScalarType;
-import graphql.schema.GraphQLSchema;
-import graphql.schema.StaticDataFetcher;
-import org.activiti.cloud.services.query.graphql.scalar.GraphQLVariableValueCoercing;
+import org.activiti.cloud.services.query.graphql.scalar.JsonScalar;
 import org.activiti.cloud.services.query.graphql.web.ActivitiGraphQLController;
 import org.activiti.cloud.services.query.model.ProcessInstanceEntity;
 import org.activiti.cloud.services.query.model.VariableValue;
@@ -43,6 +34,17 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportAware;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
+
+import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
+import com.introproventures.graphql.jpa.query.schema.GraphQLSchemaBuilder;
+import com.introproventures.graphql.jpa.query.schema.JavaScalars;
+import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaExecutor;
+import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaSchemaBuilder;
+
+import graphql.GraphQL;
+import graphql.schema.GraphQLScalarType;
+import graphql.schema.GraphQLSchema;
+import graphql.schema.StaticDataFetcher;
 
 /**
  * Spring Boot auto configuration of Activiti GraphQL Query Service components
@@ -75,8 +77,8 @@ public class ActivitiGraphQLAutoConfiguration {
             subscriptionSchemaBuilder.withSubscription(subscriptionProperties.getSubscriptionFieldName(),
                                                        new StaticDataFetcher(null));
 
-            new JavaScalars().register(VariableValue.class,
-                                       new GraphQLScalarType("VariableValue", "VariableValue type", new GraphQLVariableValueCoercing()));
+            JavaScalars.register(VariableValue.class,
+                    new GraphQLScalarType("VariableValue", "VariableValue type", new JsonScalar()));
 
             // Merge query and subscriptions schemas into one
             GraphQLSchema querySchema = GraphQLSchema
