@@ -17,7 +17,6 @@ package org.activiti.cloud.services.query.graphql.autoconfigure;
 
 import javax.persistence.EntityManager;
 
-import org.activiti.cloud.services.query.graphql.scalar.JsonScalar;
 import org.activiti.cloud.services.query.graphql.web.ActivitiGraphQLController;
 import org.activiti.cloud.services.query.model.ProcessInstanceEntity;
 import org.activiti.cloud.services.query.model.VariableValue;
@@ -38,6 +37,7 @@ import org.springframework.util.Assert;
 import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
 import com.introproventures.graphql.jpa.query.schema.GraphQLSchemaBuilder;
 import com.introproventures.graphql.jpa.query.schema.JavaScalars;
+import com.introproventures.graphql.jpa.query.schema.JavaScalars.GraphQLObjectCoercing;
 import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaExecutor;
 import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaSchemaBuilder;
 
@@ -78,7 +78,7 @@ public class ActivitiGraphQLAutoConfiguration {
                                                        new StaticDataFetcher(null));
 
             JavaScalars.register(VariableValue.class,
-                    new GraphQLScalarType("VariableValue", "VariableValue type", new JsonScalar()));
+                    new GraphQLScalarType("VariableValue", "VariableValue type", new GraphQLObjectCoercing()));
 
             // Merge query and subscriptions schemas into one
             GraphQLSchema querySchema = GraphQLSchema
