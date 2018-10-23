@@ -169,6 +169,40 @@ public class ActivitiGraphQLControllerIT {
     }
 
     @Test
+    public void testGraphqlReverse() {
+        // @formatter:off
+        GraphQLQueryRequest query = new GraphQLQueryRequest(
+        		" query {"
+        	    + " Variables {"
+        	    + "    select {"
+        	    + "      id"
+        	    + "      name"
+        	    + "      value"
+        	    + "      processInstance(where: {status: {EQ: RUNNING}}) {"
+        	    + "        id"
+        	    + "      }"
+        	    + "    }"
+        	    + "  }"
+        	    + "}"
+        		);
+       // @formatter:on
+
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
+
+        assertThat(HttpStatus.OK)
+            .describedAs(entity.toString())
+            .isEqualTo(entity.getStatusCode());
+
+        Result result = entity.getBody();
+
+        assertThat(result).isNotNull();
+        assertThat(result.getErrors().isEmpty())
+            .describedAs(result.getErrors().toString())
+            .isTrue();
+        assertThat(((Map<String, Object>) result.getData()).get("Variables")).isNotNull();
+    }
+    
+    @Test
     public void testGraphqlArguments() throws JsonParseException, JsonMappingException, IOException {
         GraphQLQueryRequest query = new GraphQLQueryRequest("query TasksQuery($name: String!) {Tasks(where:{name:{EQ: $name}}) {select{id assignee priority}}}");
 
