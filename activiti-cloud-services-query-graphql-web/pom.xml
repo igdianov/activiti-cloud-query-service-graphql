@@ -12,7 +12,7 @@
   <name>Activiti Cloud Query :: Services :: Query GraphQL Web</name>
   <dependencies>
     <dependency>
-      <groupId>org.activiti.cloud</groupId>
+      <groupId>org.activiti.cloud.query</groupId>
       <artifactId>activiti-cloud-services-query-model</artifactId>
     </dependency>
     <dependency>
