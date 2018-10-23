@@ -12,7 +12,6 @@
 	
 	<properties>
 		<graphql-jpa-query.version>0.3.7</graphql-jpa-query.version>
-		<graphql-jpa-query.version>0.3.7-SNAPSHOT</graphql-jpa-query.version>
         <activiti-cloud-services-query-model.version>7.0.0-SNAPSHOT</activiti-cloud-services-query-model.version>
 	</properties>
 
