@@ -11,7 +11,8 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<graphql-jpa-query.version>0.3.7</graphql-jpa-query.version>
+		<graphql-jpa-query.version>0.3.8-SNAPSHOT</graphql-jpa-query.version>
+        <graphql-java.version>9.4</graphql-java.version>
         <activiti-cloud-services-query-model.version>7.0.0-GRAPHQL</activiti-cloud-services-query-model.version>
 	</properties>
 

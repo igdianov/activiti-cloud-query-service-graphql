@@ -22,6 +22,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import graphql.execution.ExecutionContext;
 import graphql.language.Field;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentBuilder;
@@ -29,10 +33,6 @@ import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
-
-import org.activiti.cloud.services.query.graphql.ws.datafetcher.GraphQLStompRelayDataFetcherDestinationResolver;
-import org.junit.Before;
-import org.junit.Test;
 
 
 public class GraphQLStompRelayDataFetcherDestinationResolverTest {
@@ -71,6 +71,7 @@ public class GraphQLStompRelayDataFetcherDestinationResolverTest {
                         put("arg2","value2");
                     }
                 })
+                .executionContext(mock(ExecutionContext.class))
                 .build();
 
         // when
@@ -86,6 +87,7 @@ public class GraphQLStompRelayDataFetcherDestinationResolverTest {
         DataFetchingEnvironment environment = new DataFetchingEnvironmentBuilder()
                 .fieldDefinition(fieldDefinition)
                 .fields(Arrays.asList(new Field("Field")))
+                .executionContext(mock(ExecutionContext.class))
                 .build();
 
         // when
@@ -106,6 +108,7 @@ public class GraphQLStompRelayDataFetcherDestinationResolverTest {
                         put("arg2","value2");
                     }
                 })
+                .executionContext(mock(ExecutionContext.class))
                 .build();
 
         // when
@@ -126,6 +129,7 @@ public class GraphQLStompRelayDataFetcherDestinationResolverTest {
                         put("wrong","value2");
                     }
                 })
+                .executionContext(mock(ExecutionContext.class))
                 .build();
 
         // when
