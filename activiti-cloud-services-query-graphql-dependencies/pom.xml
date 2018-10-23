@@ -18,7 +18,7 @@
 	<dependencyManagement>
 		<dependencies>
             <dependency>
-                <groupId>org.activiti.cloud.query</groupId>
+                <groupId>org.activiti.cloud</groupId>
                 <artifactId>activiti-cloud-services-query-model</artifactId>
                 <version>${activiti-cloud-services-query-model.version}</version>
             </dependency>        
