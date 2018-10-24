@@ -48,7 +48,8 @@ import graphql.ExecutionResult;
 @ConditionalOnWebApplication
 @ConditionalOnClass(GraphQLExecutor.class)
 @ConditionalOnProperty(name = "spring.activiti.cloud.services.query.graphql.enabled", matchIfMissing = true)
-@Transactional // Fixes unable to access lob stream: Caused by: org.postgresql.util.PSQLException: Large Objects may not be used in auto-commit mode.
+@Transactional(readOnly=true) // Fixes unable to access lob stream: 
+							  // Caused by: org.postgresql.util.PSQLException: Large Objects may not be used in auto-commit mode. 
 public class ActivitiGraphQLController {
 
     private static final String PATH = "${spring.activiti.cloud.services.query.graphql.path:/admin/graphql}";
