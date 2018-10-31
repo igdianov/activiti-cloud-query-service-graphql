@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.activiti.cloud.query</groupId>
         <artifactId>activiti-cloud-query-service-graphql-parent</artifactId>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.0.27</version>
         <relativePath>..</relativePath>
     </parent>
     
