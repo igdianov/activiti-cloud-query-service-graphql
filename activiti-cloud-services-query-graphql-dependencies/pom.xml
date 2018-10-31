@@ -3,17 +3,21 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.activiti.cloud</groupId>
+        <groupId>org.activiti.cloud.query</groupId>
         <artifactId>activiti-cloud-query-service-graphql-parent</artifactId>
         <version>7.0.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
+    
     <artifactId>activiti-cloud-services-query-graphql-dependencies</artifactId>
     <packaging>pom</packaging>
 
     <properties>
+        <activiti-cloud-build.version>7.0.0.Beta2</activiti-cloud-build.version>
+        <activiti-cloud-service-common.version>7.0.0.Beta2</activiti-cloud-service-common.version>
         <graphql-java.version>9.4</graphql-java.version> 
-        <graphql-jpa-query.version>0.3.9-SNAPSHOT</graphql-jpa-query.version>
-        <activiti-cloud-services-query-model.version>7.0.36</activiti-cloud-services-query-model.version>
+        <graphql-jpa-query.version>0.3.8</graphql-jpa-query.version>
+        <activiti-cloud-services-query-model.version>7.0.0.Beta2</activiti-cloud-services-query-model.version>
     </properties>
 
     <dependencyManagement>
@@ -31,37 +35,51 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.activiti.cloud</groupId>
+                <groupId>org.activiti.cloud.common</groupId>
+                <artifactId>activiti-cloud-service-common-dependencies</artifactId>
+                <version>${activiti-cloud-service-common.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.activiti.cloud.build</groupId>
+                <artifactId>activiti-cloud-dependencies-parent</artifactId>
+                <version>${activiti-cloud-build.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>            
+            <dependency>
+                <groupId>org.activiti.cloud.query</groupId>
                 <artifactId>activiti-cloud-services-query-graphql-graphiql</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.activiti.cloud</groupId>
+                <groupId>org.activiti.cloud.query</groupId>
                 <artifactId>activiti-cloud-services-query-graphql-ws-schema</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.activiti.cloud</groupId>
+                <groupId>org.activiti.cloud.query</groupId>
                 <artifactId>activiti-cloud-services-query-graphql-ws-security</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.activiti.cloud</groupId>
+                <groupId>org.activiti.cloud.query</groupId>
                 <artifactId>activiti-cloud-services-query-graphql-ws</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.activiti.cloud</groupId>
+                <groupId>org.activiti.cloud.query</groupId>
                 <artifactId>activiti-cloud-services-query-graphql-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.activiti.cloud</groupId>
+                <groupId>org.activiti.cloud.query</groupId>
                 <artifactId>activiti-cloud-services-query-graphql-notifications</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.activiti.cloud</groupId>
+                <groupId>org.activiti.cloud.query</groupId>
                 <artifactId>activiti-cloud-services-query-graphql-stomp</artifactId>
                 <version>${project.version}</version>
             </dependency>
