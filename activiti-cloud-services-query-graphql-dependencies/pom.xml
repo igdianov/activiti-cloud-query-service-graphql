@@ -13,11 +13,12 @@
     <packaging>pom</packaging>
 
     <properties>
-        <activiti-cloud-build.version>7.0.0.Beta2</activiti-cloud-build.version>
-        <activiti-cloud-service-common.version>7.0.0.Beta2</activiti-cloud-service-common.version>
+        <activiti-cloud-build.version>7.0.0.Beta3</activiti-cloud-build.version>
+        <activiti-cloud-services-query-model.version>7.0.0.Beta3</activiti-cloud-services-query-model.version>
+        <activiti-cloud-service-common.version>7.0.0.Beta3</activiti-cloud-service-common.version>
+
         <graphql-java.version>9.4</graphql-java.version> 
         <graphql-jpa-query.version>0.3.9</graphql-jpa-query.version>
-        <activiti-cloud-services-query-model.version>7.0.0.Beta2</activiti-cloud-services-query-model.version>
     </properties>
 
     <dependencyManagement>
