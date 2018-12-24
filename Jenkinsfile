@@ -3,23 +3,13 @@ pipeline {
     agent {
 	    kubernetes {
 	        // Change the name of jenkins-maven label to be able to use yaml configuration snippet
-	        label "maven-jenkins"
+	        label "maven-gke-preemptible"
 	        // Inherit from Jx Maven pod template
 	        inheritFrom "maven"
 	        // Add scheduling configuration to Jenkins builder pod template
-	        yaml """
-spec:
-  nodeSelector:
-    cloud.google.com/gke-preemptible: true
-
-  # It is necessary to add toleration to GKE preemtible pool taint to the pod in order to run it on that node pool
-  tolerations:
-  - key: gke-preemptible
-    operator: Equal
-    value: true
-    effect: NoSchedule
-"""        
-	} 
+	        yamlFile "gke-preemptible.yaml"
+	        
+	    } 
     }
     
     environment {
@@ -39,7 +29,14 @@ spec:
         }
         steps {
           container('maven') {
-            sh "make preview"
+            // Let's make preview version
+            sh "make preview-version"
+
+            // Let's test
+            sh "make install"
+
+            // Let's deploy preview version
+            sh "make deploy"
           }
         }
       }
@@ -53,7 +50,7 @@ spec:
             sh "make checkout"
 
             // so we can retrieve the version in later steps
-            sh "make version"
+            sh "make next-version"
             
             // Let's test first
             sh "make install"
@@ -72,14 +69,15 @@ spec:
         }
         steps {
           container('maven') {
+            // Let's publish release notes in Github using commits between previous and last tags
+            sh "make changelog"
+
             // Let's push changes and open PRs to downstream repositories
             sh "make updatebot/push"
 
             // Let's update any open PRs
             sh "make updatebot/update"
 
-            // Let's publish release notes in Github using commits between previous and last tags
-            sh "make changelog"
           }
         }
       }
@@ -88,15 +86,5 @@ spec:
         always {
             cleanWs()
         }
-/*
-        failure {
-
-		input """Pipeline failed. 
-We will keep the build pod around to help you diagnose any failures. 
-
-Select Proceed or Abort to terminate the build pod"""
-        }
-*/	
-
     }
 }

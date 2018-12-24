@@ -16,7 +16,6 @@
 package org.activiti.cloud.services.query.graphql.ws.config;
 
 import graphql.GraphQL;
-
 import org.activiti.cloud.services.query.graphql.ws.datafetcher.GraphQLSubscriptionExecutor;
 import org.activiti.cloud.services.query.graphql.ws.datafetcher.StompRelayDestinationResolver;
 import org.activiti.cloud.services.query.graphql.ws.datafetcher.StompRelayPublisherFactory;
@@ -37,10 +36,10 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.ReactorNettyTcpStompClient;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.config.annotation.DelegatingWebSocketMessageBrokerConfiguration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.messaging.SubProtocolWebSocketHandler;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
@@ -53,8 +52,8 @@ public class GraphQLWebSocketMessageBrokerAutoConfiguration {
 
     @Configuration
     @EnableWebSocket
-    @EnableWebSocketMessageBroker
-    public static class DefaultGraphQLWebSocketMessageBrokerConfiguration extends GraphQLWebSocketMessageBrokerConfigurationSupport implements WebSocketMessageBrokerConfigurer {
+    public static class DefaultGraphQLWebSocketMessageBrokerConfiguration 
+                            extends DelegatingWebSocketMessageBrokerConfiguration {
 
         @Autowired
         private GraphQLWebSocketMessageBrokerConfigurationProperties configurationProperties;

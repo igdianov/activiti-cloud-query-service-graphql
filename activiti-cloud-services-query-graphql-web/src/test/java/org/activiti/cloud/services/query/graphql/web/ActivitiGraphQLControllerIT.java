@@ -22,6 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import graphql.ExecutionResult;
+import graphql.GraphQLError;
 import org.activiti.cloud.services.query.graphql.autoconfigure.EnableActivitiGraphQLQueryService;
 import org.activiti.cloud.services.query.graphql.web.ActivitiGraphQLController.GraphQLQueryRequest;
 import org.junit.Test;
@@ -36,12 +40,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
-import graphql.ExecutionResult;
-import graphql.GraphQLError;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -173,7 +171,7 @@ public class ActivitiGraphQLControllerIT {
         // @formatter:off
         GraphQLQueryRequest query = new GraphQLQueryRequest(
         		" query {"
-        	    + " Variables {"
+        	    + " ProcessVariables {"
         	    + "    select {"
         	    + "      id"
         	    + "      name"
@@ -199,7 +197,7 @@ public class ActivitiGraphQLControllerIT {
         assertThat(result.getErrors().isEmpty())
             .describedAs(result.getErrors().toString())
             .isTrue();
-        assertThat(((Map<String, Object>) result.getData()).get("Variables")).isNotNull();
+        assertThat(((Map<String, Object>) result.getData()).get("ProcessVariables")).isNotNull();
     }
     
     @Test

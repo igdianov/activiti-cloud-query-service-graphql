@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,12 +42,6 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observables.ConnectableObservable;
 import io.reactivex.observers.TestObserver;
-
-import org.activiti.cloud.services.query.graphql.ws.transport.GraphQLBrokerChannelSubscriber;
-import org.activiti.cloud.services.query.graphql.ws.transport.GraphQLBrokerMessageHandler;
-import org.activiti.cloud.services.query.graphql.ws.transport.GraphQLBrokerSubscriptionRegistry;
-import org.activiti.cloud.services.query.graphql.ws.transport.GraphQLMessage;
-import org.activiti.cloud.services.query.graphql.ws.transport.GraphQLMessageType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -418,10 +413,12 @@ public class GraphQLBrokerMessageHandlerTest {
         when(nativeSession.getId()).thenReturn(sessionId);
         when(nativeSession.getUserPrincipal()).thenReturn(mock(Principal.class));
 
-        StandardWebSocketSession wsSession = new StandardWebSocketSession(null,
+        StandardWebSocketSession wsSession = spy(new StandardWebSocketSession(null,
                                                                           null,
                                                                           null,
-                                                                          null);
+                                                                          null));
+        
+        when(wsSession.getId()).thenReturn(sessionId);
         wsSession.initializeNativeSession(nativeSession);
 
         return wsSession;

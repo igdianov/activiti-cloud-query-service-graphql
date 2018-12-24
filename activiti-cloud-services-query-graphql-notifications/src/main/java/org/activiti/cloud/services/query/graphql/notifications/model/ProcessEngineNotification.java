@@ -15,10 +15,10 @@
  */
 package org.activiti.cloud.services.query.graphql.notifications.model;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-public abstract class ProcessEngineNotification extends HashMap<String, Object>{
+public abstract class ProcessEngineNotification extends LinkedHashMap<String, Object>{
 
     /**
      * serialVersionUID

@@ -11,12 +11,21 @@ type Query {
 }
 
 type Subscription {
-    ProcessEngineNotification(serviceName : String, appName : String) : ProcessEngineNotification
+    ProcessEngineNotification(
+    	serviceName : String, 
+    	appName : String, 
+    	processDefinitionKey : String,
+		processInstanceId : String. 
+		businessKey : String
+    ) : ProcessEngineNotification
 }
 
 type ProcessEngineNotification {
 	serviceName : String
 	appName : String 
+	processDefinitionKey : String 
+	processInstanceId : String 
+	businessKey : String 
 	PROCESS_STARTED : [PROCESS_STARTED]
 	PROCESS_COMPLETED : [PROCESS_COMPLETED]
 	PROCESS_CREATED : [PROCESS_CREATED]
@@ -46,10 +55,12 @@ type ProcessEngineNotification {
 
 type ProcessInstanceType {
 	id : String
+	parentId : String
 	name : String
 	description : String
 	processDefinitionId : String
 	processDefinitionKey : String
+	processDefinitionVersion : Long
 	businessKey: String
 	initiator : String
 	startDate : String

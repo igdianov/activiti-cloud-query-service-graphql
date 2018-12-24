@@ -77,12 +77,12 @@ public class ActivitiGraphQLSchemaBuildTest {
             .hasSize(1);
 
         //then
-        assertThat(schema.getQueryType().getFieldDefinition("Variable")
+        assertThat(schema.getQueryType().getFieldDefinition("ProcessVariable")
             .getArgument("id").getType())
             .isEqualTo(Scalars.GraphQLLong);
 
         //then
-        assertThat(schema.getQueryType().getFieldDefinition("Variable")
+        assertThat(schema.getQueryType().getFieldDefinition("ProcessVariable")
             .getArguments())
             .describedAs("Ensure query has correct number of arguments")
             .hasSize(1);
@@ -124,15 +124,28 @@ public class ActivitiGraphQLSchemaBuildTest {
             .describedAs("Ensure query has correct number of arguments")
             .hasSize(2);
 
-        assertThat(schema.getQueryType().getFieldDefinition("Variables")
+        assertThat(schema.getQueryType().getFieldDefinition("ProcessVariables")
            .getArgument("page"))
            .describedAs( "Ensure that collections can be queried on by page")
            .isNotNull();
 
-       assertThat(schema.getQueryType().getFieldDefinition("Variables")
+       assertThat(schema.getQueryType().getFieldDefinition("ProcessVariables")
            .getArguments())
            .describedAs("Ensure query has correct number of arguments")
            .hasSize(2);
+
+        assertThat(schema.getQueryType()
+                         .getFieldDefinition("TaskVariables")
+                         .getArgument("page"))
+                                              .describedAs("Ensure that collections can be queried on by page")
+                                              .isNotNull();
+
+        assertThat(schema.getQueryType()
+                         .getFieldDefinition("TaskVariables")
+                         .getArguments())
+                                         .describedAs("Ensure query has correct number of arguments")
+                                         .hasSize(2);
+       
     }
 
 }
