@@ -18,50 +18,62 @@ package org.activiti.cloud.services.query.graphql.notifications.consumer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.activiti.cloud.services.query.graphql.notifications.NotificationsGateway;
-import org.activiti.cloud.services.query.graphql.notifications.NotificationsGatewaySupport;
 import org.activiti.cloud.services.query.graphql.notifications.RoutingKeyResolver;
 import org.activiti.cloud.services.query.graphql.notifications.config.NotificationsGatewayChannels;
 import org.activiti.cloud.services.query.graphql.notifications.model.ProcessEngineNotification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.messaging.Message;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-public class NotificationsConsumerChannelHandler extends NotificationsGatewaySupport {
+public class NotificationsConsumerChannelHandler {
 
     private static Logger LOGGER = LoggerFactory.getLogger(NotificationsConsumerChannelHandler.class);
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     private final ProcessEngineNotificationTransformer transformer;
+    private final NotificationsGateway notificationsGateway;
+    private final RoutingKeyResolver routingKeyResolver;
+
 
     public NotificationsConsumerChannelHandler(NotificationsGateway notificationsGateway,
                                                ProcessEngineNotificationTransformer transformer,
                                                RoutingKeyResolver routingKeyResolver)
     {
-        super(notificationsGateway, routingKeyResolver);
 
         this.transformer = transformer;
-
+        this.notificationsGateway = notificationsGateway;
+        this.routingKeyResolver = routingKeyResolver;
     }
 
     @StreamListener(NotificationsGatewayChannels.NOTIFICATIONS_CONSUMER)
-    public synchronized void receive(List<Map<String,Object>> events) throws JsonProcessingException {
+    public synchronized void receive(Message<List<Map<String,Object>>> source) throws JsonProcessingException {
+        List<Map<String,Object>> events = source.getPayload();
+        String sourceRoutingKey = (String) source.getHeaders().get("routingKey");
 
-        LOGGER.info("Received events: {}", new ObjectMapper().writeValueAsString(events));
+        LOGGER.info("Recieved source message with routingKey: {}", sourceRoutingKey);
+        
+        if(LOGGER.isDebugEnabled())
+            LOGGER.debug("Source events: {}", objectMapper.writeValueAsString(events));
     	
         List<ProcessEngineNotification> notifications = transformer.transform(events);
 
         if(LOGGER.isDebugEnabled())
-            LOGGER.debug("Transformed notifications {}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(notifications));
+            LOGGER.debug("Transformed notifications {}",objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(notifications));
 
         for (ProcessEngineNotification notification : notifications) {
-            if(LOGGER.isDebugEnabled())
-                LOGGER.debug("Handle {} from {}", notification, NotificationsGatewayChannels.NOTIFICATIONS_CONSUMER);
 
-            notify(notification);
+            String routingKey = Optional.ofNullable(sourceRoutingKey)
+                                .orElseGet(() -> routingKeyResolver.resolveRoutingKey(notification));
+
+            LOGGER.info("Routing notification to: {}", routingKey);
+            
+            notificationsGateway.send(notification, routingKey);
         }
     }
 

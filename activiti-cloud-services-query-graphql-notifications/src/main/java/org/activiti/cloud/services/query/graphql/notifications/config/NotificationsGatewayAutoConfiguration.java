@@ -68,15 +68,12 @@ public class NotificationsGatewayAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public NotificationsConsumerChannelHandler notificationsConsumerChannelHandler(
-               NotificationsGateway notificationsGateway,
-               ProcessEngineNotificationTransformer processEngineNotificationTransformer,
-               RoutingKeyResolver routingKeyResolver)
-    {
-        return new NotificationsConsumerChannelHandler(
-                       notificationsGateway,
-                       processEngineNotificationTransformer,
-                       routingKeyResolver);
+    public NotificationsConsumerChannelHandler notificationsConsumerChannelHandler(NotificationsGateway notificationsGateway,
+                                                                                   ProcessEngineNotificationTransformer processEngineNotificationTransformer,
+                                                                                   RoutingKeyResolver routingKeyResolver)    {
+        return new NotificationsConsumerChannelHandler(notificationsGateway,
+                                                       processEngineNotificationTransformer,
+                                                       routingKeyResolver);
     }
 
 }

@@ -18,6 +18,7 @@ package org.activiti.cloud.services.query.graphql.notifications.graphql;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,8 +55,7 @@ public class GraphQLProcessEngineNotificationTransformer implements ProcessEngin
     }
 
     private boolean isValid(Map<String, Object> event) {
-        return  Stream.of(attributeKeys).allMatch(key -> event.get(key) != null)
-                && event.get(eventTypeKey) != null;
+        return event.get(eventTypeKey) != null;
     }
 
     private String eventType(Map<String, Object> map) {
@@ -64,7 +64,7 @@ public class GraphQLProcessEngineNotificationTransformer implements ProcessEngin
 
     private Map<String, Object> processEngineEventAttributes(Map<String, Object> map) {
         return Stream.of(attributeKeys)
-           .map(key -> new AbstractMap.SimpleEntry<String, Object>(key, map.get(key)))
-           .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+           .map(key -> new AbstractMap.SimpleEntry<String, Object>(key, map.getOrDefault(key, "")))
+           .collect(Collectors.toMap(e -> e.getKey(), v -> Optional.ofNullable(v.getValue()).orElse("")));
     }
 }

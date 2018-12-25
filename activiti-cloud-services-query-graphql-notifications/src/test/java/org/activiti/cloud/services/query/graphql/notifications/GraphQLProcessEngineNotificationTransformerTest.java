@@ -139,7 +139,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
     }
 
     @Test
-    public void transformFilterNullAttributes() throws JsonProcessingException {
+    public void transformNullAttributes() throws JsonProcessingException {
         // given
         List<Map<String, Object>> events = new ArrayList<Map<String, Object>>() {
             private static final long serialVersionUID = 1L;
@@ -204,19 +204,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
         LOGGER.info("\n{}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(notifications));
 
         // then
-        assertThat(notifications).hasSize(2);
-
-        assertThat(notifications.get(0).get("serviceName")).isEqualTo("rb");
-        assertThat(notifications.get(0).keySet())
-                .containsOnly("serviceName","appName","type2","businessKey","processDefinitionKey","processInstanceId");
-        assertThat(notifications.get(0).get("type2")).asList().hasSize(1);
-
-        assertThat(notifications.get(1).get("serviceName")).isEqualTo("rb1");
-        assertThat(notifications.get(1).keySet())
-                .containsOnly("serviceName","appName","type1","businessKey","processDefinitionKey","processInstanceId");
-        assertThat(notifications.get(1).get("type1")).asList().hasSize(1);
-
-
+        assertThat(notifications).hasSize(4);
     }
 
     @Test
@@ -285,31 +273,15 @@ public class GraphQLProcessEngineNotificationTransformerTest {
         LOGGER.info("\n{}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(notifications));
 
         // then
-        assertThat(notifications).hasSize(1);
+        assertThat(notifications).hasSize(2);
         assertThat(notifications.get(0).get("serviceName")).isEqualTo("rb");
-        assertThat(notifications.get(0).keySet())
-            .containsOnly("serviceName","appName","type2","businessKey","processDefinitionKey","processInstanceId");
-        assertThat(notifications.get(0).get("type2")).asList().hasSize(2);
-
+        assertThat(notifications.get(1).get("serviceName")).isEqualTo("");
+        
     }
     
     @Test
-    public void test1() throws JsonParseException, JsonMappingException, IOException {
+    public void testJson() throws JsonParseException, JsonMappingException, IOException {
     	// given
-    	String json = "["
-    			+ "{\"eventType\":\"PROCESS_CREATED\",\"id\":\"45c13b64-3080-4033-b8a0-de034de79fff\",\"timestamp\":1539759664348,\"businessKey\":\"bk1\",\"processDefinitionKey\":\"SimpleProcess\",\"entity\":{\"id\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"processDefinitionId\":\"SimpleProcess:1:d16b315b-d197-11e8-9cf0-0a580a2c1105\",\"processDefinitionKey\":\"SimpleProcess\",\"initiator\":\"hruser\",\"startDate\":\"2018-10-17T07:01:04.347+0000\",\"status\":\"RUNNING\"},\"appName\":\"default-app\",\"serviceFullName\":\"rb-my-app\",\"appVersion\":\"\",\"serviceName\":\"rb-my-app\",\"serviceVersion\":\"\",\"serviceType\":\"runtime-bundle\",\"entityId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\"},"
-    			+ "{\"eventType\":\"VARIABLE_CREATED\",\"id\":\"6995a480-79d8-47f6-9fed-ce8256f00a8a\",\"timestamp\":1539759664348,\"businessKey\":\"bk1\",\"processDefinitionKey\":\"SimpleProcess\",\"entity\":{\"name\":\"firstName\",\"type\":\"string\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"value\":\"Paulo\",\"taskVariable\":false},\"appName\":\"default-app\",\"serviceFullName\":\"rb-my-app\",\"appVersion\":\"\",\"serviceName\":\"rb-my-app\",\"serviceVersion\":\"\",\"serviceType\":\"runtime-bundle\",\"entityId\":\"firstName\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\"},"
-    			+ "{\"eventType\":\"VARIABLE_CREATED\",\"id\":\"12c5f1a2-eaee-4f9c-922c-07193d908dc1\",\"timestamp\":1539759664348,\"businessKey\":\"bk1\",\"processDefinitionKey\":\"SimpleProcess\",\"entity\":{\"name\":\"lastName\",\"type\":\"string\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"value\":\"Silva\",\"taskVariable\":false},\"appName\":\"default-app\",\"serviceFullName\":\"rb-my-app\",\"appVersion\":\"\",\"serviceName\":\"rb-my-app\",\"serviceVersion\":\"\",\"serviceType\":\"runtime-bundle\",\"entityId\":\"lastName\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\"},"
-    			+ "{\"eventType\":\"VARIABLE_CREATED\",\"id\":\"f5755eb9-79db-4ef1-9cd0-f9ee0f2bc798\",\"timestamp\":1539759664348,\"businessKey\":\"bk1\",\"processDefinitionKey\":\"SimpleProcess\",\"entity\":{\"name\":\"age\",\"type\":\"integer\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"value\":25,\"taskVariable\":false},\"appName\":\"default-app\",\"serviceFullName\":\"rb-my-app\",\"appVersion\":\"\",\"serviceName\":\"rb-my-app\",\"serviceVersion\":\"\",\"serviceType\":\"runtime-bundle\",\"entityId\":\"age\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\"},"
-    			+ "{\"eventType\":\"PROCESS_STARTED\",\"id\":\"5e72ecfd-9611-43fd-a363-12c7d348c051\",\"timestamp\":1539759664348,\"businessKey\":\"bk1\",\"processDefinitionKey\":\"SimpleProcess\",\"entity\":{\"id\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"processDefinitionId\":\"SimpleProcess:1:d16b315b-d197-11e8-9cf0-0a580a2c1105\",\"processDefinitionKey\":\"SimpleProcess\",\"initiator\":\"hruser\",\"startDate\":\"2018-10-17T07:01:04.347+0000\",\"status\":\"RUNNING\"},\"appName\":\"default-app\",\"serviceFullName\":\"rb-my-app\",\"appVersion\":\"\",\"serviceName\":\"rb-my-app\",\"serviceVersion\":\"\",\"serviceType\":\"runtime-bundle\",\"entityId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\"},"
-    			+ "{\"eventType\":\"ACTIVITY_STARTED\",\"id\":\"40d82d95-cc0e-4b7c-8a62-5a84d11e7066\",\"timestamp\":1539759664348,\"businessKey\":\"bk1\",\"processDefinitionKey\":\"SimpleProcess\",\"entity\":{\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"processDefinitionId\":\"SimpleProcess:1:d16b315b-d197-11e8-9cf0-0a580a2c1105\",\"activityType\":\"startEvent\",\"elementId\":\"startEvent1\"},\"appName\":\"default-app\",\"serviceFullName\":\"rb-my-app\",\"appVersion\":\"\",\"serviceName\":\"rb-my-app\",\"serviceVersion\":\"\",\"serviceType\":\"runtime-bundle\",\"entityId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"processDefinitionId\":\"SimpleProcess:1:d16b315b-d197-11e8-9cf0-0a580a2c1105\",\"processDefinitionKey\":\"SimpleProcess\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\"},"
-    			+ "{\"eventType\":\"ACTIVITY_COMPLETED\",\"id\":\"9910b0cd-2a5a-466b-801e-699e57f49914\",\"timestamp\":1539759664348,\"businessKey\":\"bk1\",\"processDefinitionKey\":\"SimpleProcess\",\"entity\":{\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"processDefinitionId\":\"SimpleProcess:1:d16b315b-d197-11e8-9cf0-0a580a2c1105\",\"activityType\":\"startEvent\",\"elementId\":\"startEvent1\"},\"appName\":\"default-app\",\"serviceFullName\":\"rb-my-app\",\"appVersion\":\"\",\"serviceName\":\"rb-my-app\",\"serviceVersion\":\"\",\"serviceType\":\"runtime-bundle\",\"entityId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"processDefinitionId\":\"SimpleProcess:1:d16b315b-d197-11e8-9cf0-0a580a2c1105\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\"},"
-    			+ "{\"eventType\":\"SEQUENCE_FLOW_TAKEN\",\"id\":\"22434b43-9c4d-47b9-b92c-a67f01652938\",\"timestamp\":1539759664348,\"businessKey\":\"bk1\",\"processDefinitionKey\":\"SimpleProcess\",\"entity\":{\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"processDefinitionId\":\"SimpleProcess:1:d16b315b-d197-11e8-9cf0-0a580a2c1105\",\"sourceActivityElementId\":\"startEvent1\",\"sourceActivityType\":\"org.activiti.bpmn.model.StartEvent\",\"targetActivityElementId\":\"sid-CDFE7219-4627-43E9-8CA8-866CC38EBA94\",\"targetActivityName\":\"Perform action\",\"targetActivityType\":\"org.activiti.bpmn.model.UserTask\"},\"appName\":\"default-app\",\"serviceFullName\":\"rb-my-app\",\"appVersion\":\"\",\"serviceName\":\"rb-my-app\",\"serviceVersion\":\"\",\"serviceType\":\"runtime-bundle\",\"entityId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\"},"
-    			+ "{\"eventType\":\"ACTIVITY_STARTED\",\"id\":\"7b6f6fba-b8a6-441d-b369-46f61119db21\",\"timestamp\":1539759664348,\"businessKey\":\"bk1\",\"processDefinitionKey\":\"SimpleProcess\",\"entity\":{\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"processDefinitionId\":\"SimpleProcess:1:d16b315b-d197-11e8-9cf0-0a580a2c1105\",\"activityName\":\"Perform action\",\"activityType\":\"userTask\",\"elementId\":\"sid-CDFE7219-4627-43E9-8CA8-866CC38EBA94\"},\"appName\":\"default-app\",\"serviceFullName\":\"rb-my-app\",\"appVersion\":\"\",\"serviceName\":\"rb-my-app\",\"serviceVersion\":\"\",\"serviceType\":\"runtime-bundle\",\"entityId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\",\"processDefinitionId\":\"SimpleProcess:1:d16b315b-d197-11e8-9cf0-0a580a2c1105\",\"processDefinitionKey\":\"SimpleProcess\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\"},"
-    			+ "{\"eventType\":\"TASK_CANDIDATE_GROUP_ADDED\",\"id\":\"50c3bc94-eb6c-4c45-9d50-c5fa6a8901d2\",\"timestamp\":1539759664350,\"businessKey\":\"bk1\",\"processDefinitionKey\":\"SimpleProcess\",\"entity\":{\"taskId\":\"69d5929f-d1da-11e8-9cf0-0a580a2c1105\",\"groupId\":\"hr\"},\"appName\":\"default-app\",\"serviceFullName\":\"rb-my-app\",\"appVersion\":\"\",\"serviceName\":\"rb-my-app\",\"serviceVersion\":\"\",\"serviceType\":\"runtime-bundle\",\"entityId\":\"hr\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\"},"
-    			+ "{\"eventType\":\"TASK_CREATED\",\"id\":\"a90cb2ef-6418-4464-bd3b-baef027e041b\",\"timestamp\":1539759664351,\"businessKey\":\"bk1\",\"processDefinitionKey\":\"SimpleProcess\",\"entity\":{\"id\":\"69d5929f-d1da-11e8-9cf0-0a580a2c1105\",\"name\":\"Perform action\",\"status\":\"CREATED\",\"createdDate\":\"2018-10-17T07:01:04.348+0000\",\"priority\":50,\"processDefinitionId\":\"SimpleProcess:1:d16b315b-d197-11e8-9cf0-0a580a2c1105\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\"},\"appName\":\"default-app\",\"serviceFullName\":\"rb-my-app\",\"appVersion\":\"\",\"serviceName\":\"rb-my-app\",\"serviceVersion\":\"\",\"serviceType\":\"runtime-bundle\",\"entityId\":\"69d5929f-d1da-11e8-9cf0-0a580a2c1105\",\"processInstanceId\":\"69d56b89-d1da-11e8-9cf0-0a580a2c1105\"}"
-    			+ "]"; 
-
     	List<Map<String,Object>> events = new ObjectMapper().readValue(json, new TypeReference<List<Map<String,Object>>>(){});
     	JsonNode jsonNode = new ObjectMapper().readTree(json);
     	
@@ -335,5 +307,338 @@ public class GraphQLProcessEngineNotificationTransformerTest {
                                                          "businessKey");
 
     }
+    
+    private String json =
+    "[  \r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"PROCESS_CREATED\",\r\n" + 
+    "      \"id\":\"ebe2cb3b-c9ea-4d22-9c01-57c363405617\",\r\n" + 
+    "      \"timestamp\":1545701139583,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"id\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "         \"initiator\":\"hruser\",\r\n" + 
+    "         \"startDate\":\"2018-12-25T01:25:39.583+0000\",\r\n" + 
+    "         \"status\":\"RUNNING\",\r\n" + 
+    "         \"processDefinitionVersion\":1\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"VARIABLE_CREATED\",\r\n" + 
+    "      \"id\":\"0b127388-3a2e-4b32-a19c-5de775fafa8f\",\r\n" + 
+    "      \"timestamp\":1545701139583,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"name\":\"firstName\",\r\n" + 
+    "         \"type\":\"string\",\r\n" + 
+    "         \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"value\":\"Paulo\",\r\n" + 
+    "         \"taskVariable\":false\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"firstName\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"VARIABLE_CREATED\",\r\n" + 
+    "      \"id\":\"19b30145-8109-424b-9437-2f0fbb07031e\",\r\n" + 
+    "      \"timestamp\":1545701139583,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"name\":\"lastName\",\r\n" + 
+    "         \"type\":\"string\",\r\n" + 
+    "         \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"value\":\"Silva\",\r\n" + 
+    "         \"taskVariable\":false\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"lastName\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"VARIABLE_CREATED\",\r\n" + 
+    "      \"id\":\"f743f526-34a1-45b1-b040-7c94ca742c58\",\r\n" + 
+    "      \"timestamp\":1545701139583,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"name\":\"age\",\r\n" + 
+    "         \"type\":\"integer\",\r\n" + 
+    "         \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"value\":25,\r\n" + 
+    "         \"taskVariable\":false\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"age\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"PROCESS_STARTED\",\r\n" + 
+    "      \"id\":\"743aa709-2450-42c4-ac53-b4f2ac92e558\",\r\n" + 
+    "      \"timestamp\":1545701139583,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"id\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "         \"initiator\":\"hruser\",\r\n" + 
+    "         \"startDate\":\"2018-12-25T01:25:39.583+0000\",\r\n" + 
+    "         \"status\":\"RUNNING\",\r\n" + 
+    "         \"processDefinitionVersion\":1\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"ACTIVITY_STARTED\",\r\n" + 
+    "      \"id\":\"c57c3f3c-b54a-4312-be70-73662cf4a79d\",\r\n" + 
+    "      \"timestamp\":1545701139583,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"elementId\":\"startEvent1\",\r\n" + 
+    "         \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"activityType\":\"startEvent\"\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"startEvent1\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"ACTIVITY_COMPLETED\",\r\n" + 
+    "      \"id\":\"73811f1b-2d77-4558-846a-8ae0327e844a\",\r\n" + 
+    "      \"timestamp\":1545701139583,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"elementId\":\"startEvent1\",\r\n" + 
+    "         \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"activityType\":\"startEvent\"\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"startEvent1\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"SEQUENCE_FLOW_TAKEN\",\r\n" + 
+    "      \"id\":\"0dfb8430-86a5-4932-8d40-1ae45cc46ae1\",\r\n" + 
+    "      \"timestamp\":1545701139583,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"elementId\":\"sid-68945AF1-396F-4B8A-B836-FC318F62313F\",\r\n" + 
+    "         \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"sourceActivityElementId\":\"startEvent1\",\r\n" + 
+    "         \"sourceActivityType\":\"org.activiti.bpmn.model.StartEvent\",\r\n" + 
+    "         \"targetActivityElementId\":\"sid-CDFE7219-4627-43E9-8CA8-866CC38EBA94\",\r\n" + 
+    "         \"targetActivityName\":\"Perform action\",\r\n" + 
+    "         \"targetActivityType\":\"org.activiti.bpmn.model.UserTask\"\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"sid-68945AF1-396F-4B8A-B836-FC318F62313F\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"ACTIVITY_STARTED\",\r\n" + 
+    "      \"id\":\"56e3b7d3-61f7-4918-a729-2b9e3205bde2\",\r\n" + 
+    "      \"timestamp\":1545701139583,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"elementId\":\"sid-CDFE7219-4627-43E9-8CA8-866CC38EBA94\",\r\n" + 
+    "         \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"activityName\":\"Perform action\",\r\n" + 
+    "         \"activityType\":\"userTask\"\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"sid-CDFE7219-4627-43E9-8CA8-866CC38EBA94\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"VARIABLE_CREATED\",\r\n" + 
+    "      \"id\":\"36c3ef0a-af93-4181-8a83-a389b09c1c47\",\r\n" + 
+    "      \"timestamp\":1545701139584,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"name\":\"firstName\",\r\n" + 
+    "         \"type\":\"string\",\r\n" + 
+    "         \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"value\":\"Paulo\",\r\n" + 
+    "         \"taskId\":\"fd0b08e0-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"taskVariable\":true\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"firstName\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"VARIABLE_CREATED\",\r\n" + 
+    "      \"id\":\"219cb834-88f3-461b-bcb7-61876b0a882c\",\r\n" + 
+    "      \"timestamp\":1545701139584,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"name\":\"lastName\",\r\n" + 
+    "         \"type\":\"string\",\r\n" + 
+    "         \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"value\":\"Silva\",\r\n" + 
+    "         \"taskId\":\"fd0b08e0-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"taskVariable\":true\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"lastName\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"VARIABLE_CREATED\",\r\n" + 
+    "      \"id\":\"fa844c56-8081-4b28-b683-01b172406f17\",\r\n" + 
+    "      \"timestamp\":1545701139584,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"name\":\"age\",\r\n" + 
+    "         \"type\":\"integer\",\r\n" + 
+    "         \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"value\":25,\r\n" + 
+    "         \"taskId\":\"fd0b08e0-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"taskVariable\":true\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"age\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"TASK_CANDIDATE_GROUP_ADDED\",\r\n" + 
+    "      \"id\":\"ce5bc8ec-f3d1-424f-a683-914a58213630\",\r\n" + 
+    "      \"timestamp\":1545701139585,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"taskId\":\"fd0b08e0-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"groupId\":\"hr\"\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"hr\"\r\n" + 
+    "   },\r\n" + 
+    "   {  \r\n" + 
+    "      \"eventType\":\"TASK_CREATED\",\r\n" + 
+    "      \"id\":\"cf639247-bdd9-4f9f-99ba-1efec7d301d3\",\r\n" + 
+    "      \"timestamp\":1545701139585,\r\n" + 
+    "      \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "      \"processDefinitionKey\":\"SimpleProcess\",\r\n" + 
+    "      \"processDefinitionVersion\":1,\r\n" + 
+    "      \"entity\":{  \r\n" + 
+    "         \"id\":\"fd0b08e0-07e3-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"name\":\"Perform action\",\r\n" + 
+    "         \"status\":\"CREATED\",\r\n" + 
+    "         \"createdDate\":\"2018-12-25T01:25:39.583+0000\",\r\n" + 
+    "         \"priority\":50,\r\n" + 
+    "         \"processDefinitionId\":\"SimpleProcess:1:715f2fd2-07b1-11e9-a0d3-0a580a2c00cd\",\r\n" + 
+    "         \"processInstanceId\":\"fd0ae1ca-07e3-11e9-a0d3-0a580a2c00cd\"\r\n" + 
+    "      },\r\n" + 
+    "      \"appName\":\"default-app\",\r\n" + 
+    "      \"serviceFullName\":\"rb-my-app\",\r\n" + 
+    "      \"appVersion\":\"\",\r\n" + 
+    "      \"serviceName\":\"rb-my-app\",\r\n" + 
+    "      \"serviceVersion\":\"\",\r\n" + 
+    "      \"serviceType\":\"runtime-bundle\",\r\n" + 
+    "      \"entityId\":\"fd0b08e0-07e3-11e9-a0d3-0a580a2c00cd\"\r\n" + 
+    "   }\r\n" + 
+    "]";
 
 }
