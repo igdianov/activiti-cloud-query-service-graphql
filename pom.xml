@@ -12,7 +12,7 @@
   <groupId>org.activiti.cloud.query</groupId>
   <artifactId>activiti-cloud-query-service-graphql-parent</artifactId>
   <name>Activiti Cloud Query :: GraphQL Parent</name>
-  <version>7.0.0-SNAPSHOT</version>
+  <version>7.0.31</version>
   <packaging>pom</packaging>
   <url>http://activiti.org</url>
   
