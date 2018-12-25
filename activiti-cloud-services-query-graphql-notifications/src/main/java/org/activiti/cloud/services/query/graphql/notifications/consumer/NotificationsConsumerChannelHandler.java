@@ -18,7 +18,6 @@ package org.activiti.cloud.services.query.graphql.notifications.consumer;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +32,7 @@ import org.springframework.messaging.Message;
 
 public class NotificationsConsumerChannelHandler {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(NotificationsConsumerChannelHandler.class);
+    private static Logger log = LoggerFactory.getLogger(NotificationsConsumerChannelHandler.class);
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     private final ProcessEngineNotificationTransformer transformer;
@@ -56,22 +55,21 @@ public class NotificationsConsumerChannelHandler {
         List<Map<String,Object>> events = source.getPayload();
         String sourceRoutingKey = (String) source.getHeaders().get("routingKey");
 
-        LOGGER.info("Recieved source message with routingKey: {}", sourceRoutingKey);
+        log.info("Recieved source message with routingKey: {}", sourceRoutingKey);
         
-        if(LOGGER.isDebugEnabled())
-            LOGGER.debug("Source events: {}", objectMapper.writeValueAsString(events));
+        if(log.isDebugEnabled())
+            log.debug("Source events: {}", objectMapper.writeValueAsString(events));
     	
         List<ProcessEngineNotification> notifications = transformer.transform(events);
 
-        if(LOGGER.isDebugEnabled())
-            LOGGER.debug("Transformed notifications {}",objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(notifications));
+        if(log.isDebugEnabled())
+            log.debug("Transformed notifications {}",objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(notifications));
 
         for (ProcessEngineNotification notification : notifications) {
 
-            String routingKey = Optional.ofNullable(sourceRoutingKey)
-                                .orElseGet(() -> routingKeyResolver.resolveRoutingKey(notification));
+            String routingKey = routingKeyResolver.resolveRoutingKey(notification);
 
-            LOGGER.info("Routing notification to: {}", routingKey);
+            log.info("Routing notification to: {}", routingKey);
             
             notificationsGateway.send(notification, routingKey);
         }
