@@ -9,9 +9,9 @@
     <relativePath/>
   </parent>
 
-  <groupId>org.activiti.cloud.query</groupId>
-  <artifactId>activiti-cloud-query-service-graphql-parent</artifactId>
-  <name>Activiti Cloud Query :: GraphQL Parent</name>
+  <groupId>org.activiti.cloud.graphql</groupId>
+  <artifactId>activiti-cloud-graphql-service-parent</artifactId>
+  <name>Activiti Cloud GraphQL Service :: Parent</name>
   <version>7.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <url>http://activiti.org</url>
@@ -20,7 +20,7 @@
       <activiti-cloud-build.version>7.0.36</activiti-cloud-build.version>
       <activiti-cloud-query-dependencies.version>7.0.74</activiti-cloud-query-dependencies.version>
       <activiti-cloud-query-service-graphql.version>${project.version}</activiti-cloud-query-service-graphql.version>
-      <graphql-jpa-query.version>0.3.9</graphql-jpa-query.version>
+      <graphql-jpa-query.version>0.3.11</graphql-jpa-query.version>
   </properties>
 
   <dependencyManagement>
@@ -59,19 +59,15 @@
   </dependencies>
     
   <modules>
-    <module>activiti-cloud-services-query-graphql-dependencies</module>
-    <module>activiti-cloud-services-query-graphql-graphiql</module>
-    <module>activiti-cloud-services-query-graphql-ws-schema</module>
-    <module>activiti-cloud-services-query-graphql-ws-security</module>
-    <module>activiti-cloud-services-query-graphql-ws</module>
-    <module>activiti-cloud-services-query-graphql-web</module>
-    <module>activiti-cloud-services-query-graphql-notifications</module>
-    <module>activiti-cloud-services-query-graphql-stomp</module>
+    <module>dependencies-tests</module>
+    <module>activiti-cloud-graphql-dependencies</module>
+    <module>activiti-cloud-services-graphql</module>
+    <module>activiti-cloud-starter-graphql</module>
   </modules>
   <scm>
-    <url>https://github.com/Activiti/activiti-cloud-query-service</url>
-    <connection>scm:git:https://github.com/Activiti/activiti-cloud-query-service.git</connection>
-    <developerConnection>scm:git:https://github.com/Activiti/activiti-cloud-query-service.git</developerConnection>
+    <url>https://github.com/Activiti/activiti-cloud-query-graphql</url>
+    <connection>scm:git:https://github.com/Activiti/activiti-cloud-query-graphql.git</connection>
+    <developerConnection>scm:git:https://github.com/Activiti/activiti-cloud-query-graphql.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
   <ciManagement>
