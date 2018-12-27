@@ -36,11 +36,23 @@
     </dependency>
     <dependency>
       <groupId>org.activiti.cloud.graphql</groupId>
-      <artifactId>activiti-cloud-services-graphql-schema</artifactId>
+      <artifactId>activiti-cloud-services-graphql-jpa-query</artifactId>
     </dependency>
     <dependency>
       <groupId>org.activiti.cloud.graphql</groupId>
       <artifactId>activiti-cloud-services-graphql-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.graphql</groupId>
+      <artifactId>activiti-cloud-services-graphql-graphiql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.graphql</groupId>
+      <artifactId>activiti-cloud-services-graphql-ws</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.graphql</groupId>
+      <artifactId>activiti-cloud-services-graphql-ws-subscriptions</artifactId>
     </dependency>
     <dependency>
       <groupId>org.activiti.cloud.common</groupId>
@@ -53,6 +65,10 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-websocket</artifactId>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>

@@ -16,16 +16,18 @@
 package org.activiti.cloud.services.graphql.ws.transport;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.security.Principal;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
@@ -33,20 +35,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.websocket.Session;
 
-import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
 import graphql.ExecutionResult;
 import graphql.ExecutionResultImpl;
 import graphql.GraphQLError;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.observables.ConnectableObservable;
-import io.reactivex.observers.TestObserver;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLBrokerChannelSubscriber;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLBrokerMessageHandler;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLBrokerSubscriptionRegistry;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLMessage;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLMessageType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,6 +60,10 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.adapter.standard.StandardWebSocketSession;
+import reactor.core.Disposable;
+import reactor.core.publisher.ConnectableFlux;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 public class GraphQLBrokerMessageHandlerTest {
 
@@ -86,7 +81,7 @@ public class GraphQLBrokerMessageHandlerTest {
     private SubscribableChannel brokerChannel;
 
     @Mock
-    private GraphQLExecutor graphQLExecutor;
+    private GraphQLSubscriptionExecutor graphQLExecutor;
 
     @Mock
     private TaskScheduler taskScheduler;
@@ -205,12 +200,8 @@ public class GraphQLBrokerMessageHandlerTest {
         CountDownLatch completeLatch = new CountDownLatch(1);
 
         // Simulate stomp relay  subscription stream
-        Observable<ExecutionResult> mockStompRelayObservable = Observable
-                                                                         .intervalRange(1,
-                                                                                        100,
-                                                                                        0,
-                                                                                        10,
-                                                                                        TimeUnit.MILLISECONDS)
+        Flux<ExecutionResult> mockStompRelayObservable = Flux.interval(Duration.ZERO, Duration.ofMillis(1))
+                                                                         .take(100)                   
                                                                          .map(i -> {
                                                                              Map<String, Object> data = new HashMap<>();
                                                                              data.put("key", i);
@@ -219,8 +210,10 @@ public class GraphQLBrokerMessageHandlerTest {
                                                                                                             Collections.emptyList());
                                                                          });
 
-        TestObserver<ExecutionResult> testObserver = mockStompRelayObservable.test();
-
+        StepVerifier observable = StepVerifier.create(mockStompRelayObservable)
+                .expectNextCount(100)
+                .expectComplete();
+        
         ExecutionResult executionResult = stubExecutionResult(mockStompRelayObservable, completeLatch);
 
         when(graphQLExecutor.execute(Mockito.anyString(), Mockito.any()))
@@ -229,22 +222,26 @@ public class GraphQLBrokerMessageHandlerTest {
         // when
         this.messageHandler.handleMessage(message);
 
-        testObserver.await();
-        testObserver.assertComplete();
-
+        observable.verify(Duration.ofMinutes(2));
+        
         // then
-        verify(this.clientOutboundChannel, atLeast(1)).send(this.messageCaptor.capture());
+        verify(this.clientOutboundChannel, times(2)).send(this.messageCaptor.capture());
 
-        GraphQLMessage graphQLMessage = messageCaptor.getValue()
-                                                     .getPayload();
+        List<Message<GraphQLMessage>> messages = messageCaptor.getAllValues();
+        
+        GraphQLMessage dataMessage = messages.get(0).getPayload();
 
-        assertThat(graphQLMessage.getType()).isEqualTo(GraphQLMessageType.DATA);
-        assertThat(graphQLMessage.getId()).isEqualTo("operationId");
-        assertThat(graphQLMessage.getPayload()).containsKey("data");
-        assertThat(graphQLMessage.getPayload()
+        assertThat(dataMessage.getType()).isEqualTo(GraphQLMessageType.DATA);
+        assertThat(dataMessage.getId()).isEqualTo("operationId");
+        assertThat(dataMessage.getPayload()).containsKey("data");
+        assertThat(dataMessage.getPayload()
                                  .get("data")).asList()
                                               .isNotEmpty();
 
+        GraphQLMessage completeMessage = messages.get(1).getPayload();
+
+        assertThat(completeMessage.getType()).isEqualTo(GraphQLMessageType.COMPLETE);
+        
         assertThat(completeLatch.await(5000, TimeUnit.MILLISECONDS)).isTrue();
     }
 
@@ -429,7 +426,7 @@ public class GraphQLBrokerMessageHandlerTest {
         return wsSession;
     }
 
-    private ExecutionResult stubExecutionResult(Observable<ExecutionResult> mockStompRelayObservable,
+    private ExecutionResult stubExecutionResult(Flux<ExecutionResult> mockStompRelayObservable,
                                                 CountDownLatch completeDownLatch) {
         ExecutionResult executionResult = mock(ExecutionResult.class);
         when(executionResult.getErrors()).thenReturn(Collections.emptyList());
@@ -439,12 +436,12 @@ public class GraphQLBrokerMessageHandlerTest {
             @Override
             public Publisher<ExecutionResult> answer(InvocationOnMock invocation) throws Throwable {
 
-                ConnectableObservable<ExecutionResult> connectableObservable = mockStompRelayObservable.share()
+                ConnectableFlux<ExecutionResult> connectableObservable = mockStompRelayObservable.share()
                                                                                                        .publish();
 
                 Disposable handle = connectableObservable.connect();
 
-                return connectableObservable.toFlowable(BackpressureStrategy.BUFFER)
+                return connectableObservable.onBackpressureBuffer()
                                             .doOnComplete(() -> {
                                                 completeDownLatch.countDown();
                                             })

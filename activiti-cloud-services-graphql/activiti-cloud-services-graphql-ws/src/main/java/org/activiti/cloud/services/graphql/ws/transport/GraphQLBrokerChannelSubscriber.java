@@ -15,14 +15,13 @@
  */
 package org.activiti.cloud.services.graphql.ws.transport;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import graphql.ExecutionResult;
-import io.reactivex.subjects.PublishSubject;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
@@ -32,6 +31,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import reactor.core.publisher.DirectProcessor;
 
 public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResult>{
 
@@ -43,7 +43,7 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
 
 	private final String operationMessageId;
 
-	private final PublishSubject<ExecutionResult> publishSubject = PublishSubject.create();
+	private final DirectProcessor<ExecutionResult> publishSubject = DirectProcessor.create();
 
     private final AtomicReference<Subscription> subscriptionRef = new AtomicReference<>();
 
@@ -57,7 +57,7 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
 
 		publishSubject
 			.map(ExecutionResult::getData)
-			.buffer(bufferTimeSpanMs, TimeUnit.MILLISECONDS, bufferCount)
+			.bufferTimeout(bufferCount, Duration.ofMillis(bufferTimeSpanMs))
 			.subscribe(this::sendDataToClient);
 	}
 

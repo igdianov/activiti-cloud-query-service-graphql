@@ -16,12 +16,10 @@
 package org.activiti.cloud.services.graphql.ws.config;
 
 import graphql.GraphQL;
-import org.activiti.cloud.services.graphql.ws.datafetcher.GraphQLSubscriptionExecutor;
-import org.activiti.cloud.services.graphql.ws.datafetcher.StompRelayDestinationResolver;
-import org.activiti.cloud.services.graphql.ws.datafetcher.StompRelayFluxPublisherFactory;
-import org.activiti.cloud.services.graphql.ws.datafetcher.StompRelayPublisherFactory;
+import graphql.schema.GraphQLSchema;
 import org.activiti.cloud.services.graphql.ws.transport.GraphQLBrokerMessageHandler;
 import org.activiti.cloud.services.graphql.ws.transport.GraphQLBrokerSubProtocolHandler;
+import org.activiti.cloud.services.graphql.ws.transport.GraphQLSubscriptionExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -32,9 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.SubscribableChannel;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.messaging.simp.stomp.ReactorNettyTcpStompClient;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.DelegatingWebSocketMessageBrokerConfiguration;
@@ -42,6 +38,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.messaging.SubProtocolWebSocketHandler;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
@@ -86,25 +83,6 @@ public class GraphQLWebSocketMessageBrokerAutoConfiguration {
         }
 
         @Bean
-        @ConditionalOnMissingBean
-        public ReactorNettyTcpStompClient stompClient() {
-            ReactorNettyTcpStompClient stompClient = new ReactorNettyTcpStompClient(configurationProperties.getRelayHost(),
-                                                                                    configurationProperties.getRelayPort());
-            stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-
-            return stompClient;
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public StompRelayPublisherFactory stompRelayPublisherFactory(ReactorNettyTcpStompClient stompClient,
-                                                                     StompRelayDestinationResolver stompRelayDestinationResolver) {
-            return new StompRelayFluxPublisherFactory(stompClient).login(configurationProperties.getClientLogin())
-                                                              .passcode(configurationProperties.getClientPasscode())
-                                                              .destinationResolver(stompRelayDestinationResolver);
-        }
-
-        @Bean
         @ConditionalOnMissingBean(GraphQLBrokerMessageHandler.class)
         public MessageHandler graphQLBrokerMessageHandler(SubscribableChannel clientInboundChannel,
                                                           MessageChannel clientOutboundChannel,
@@ -139,7 +117,21 @@ public class GraphQLWebSocketMessageBrokerAutoConfiguration {
         public GraphQLBrokerSubProtocolHandler graphQLBrokerSubProtocolHandler() {
             return new GraphQLBrokerSubProtocolHandler(configurationProperties.getEndpoint());
         }
-
+        
+        @Bean
+        @ConditionalOnMissingBean
+        public GraphQLSubscriptionExecutor graphQLSubscriptionExecutor(GraphQLSchema graphQLSchema) {
+            return new GraphQLSubscriptionExecutor(graphQLSchema);
+        }
+        
+        @Bean
+        public ServletServerContainerFactoryBean createWebSocketContainer() {
+            ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
+            container.setMaxTextMessageBufferSize(1024*64);
+            container.setMaxBinaryMessageBufferSize(1024*10);
+            container.setMaxSessionIdleTimeout(30000L);
+            return container;
+        }          
     }
 
 }

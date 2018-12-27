@@ -24,6 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.codahale.metrics.annotation.Timed;
+import graphql.ExecutionResult;
 import org.activiti.cloud.services.graphql.ws.util.QueryParameters;
 import org.reactivestreams.Publisher;
 import org.springframework.context.event.EventListener;
@@ -41,11 +43,6 @@ import org.springframework.messaging.support.MessageHeaderInitializer;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.util.Assert;
 
-import com.codahale.metrics.annotation.Timed;
-import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
-
-import graphql.ExecutionResult;
-
 public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
 
     public final static String BROKER_NOT_AVAILABLE = "Broker Not Available.";
@@ -62,7 +59,7 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
 
 	private ScheduledFuture<?> heartbeatFuture;
 
-    private final GraphQLExecutor graphQLSubscriptionExecutor;
+    private final GraphQLSubscriptionExecutor graphQLSubscriptionExecutor;
 
     private final GraphQLBrokerSubscriptionRegistry graphQLsubscriptionRegistry;
 
@@ -71,7 +68,7 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
 	private int bufferCount = 50;
 
 	public GraphQLBrokerMessageHandler(SubscribableChannel inboundChannel, MessageChannel outboundChannel,
-			SubscribableChannel brokerChannel, GraphQLExecutor graphQLSubscriptionExecutor) {
+			SubscribableChannel brokerChannel, GraphQLSubscriptionExecutor graphQLSubscriptionExecutor) {
 		super(inboundChannel, outboundChannel, brokerChannel);
 
 		this.graphQLSubscriptionExecutor = graphQLSubscriptionExecutor;

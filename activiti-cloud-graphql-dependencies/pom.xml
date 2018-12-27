@@ -40,7 +40,7 @@
       </dependency>
       <dependency>
         <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-ws-schema</artifactId>
+        <artifactId>activiti-cloud-services-graphql-ws-subscriptions</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -55,12 +55,7 @@
       </dependency>
       <dependency>
         <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-config</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-schema</artifactId>
+        <artifactId>activiti-cloud-services-graphql-jpa-query</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -75,7 +70,7 @@
       </dependency>
       <dependency>
         <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-stomp</artifactId>
+        <artifactId>activiti-cloud-services-graphql-ws-stomp</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>

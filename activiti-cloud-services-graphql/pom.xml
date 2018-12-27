@@ -11,12 +11,12 @@
   <modules>
     <module>activiti-cloud-services-graphql-config</module>
     <module>activiti-cloud-services-graphql-graphiql</module>
-    <module>activiti-cloud-services-graphql-notifications</module>
-    <module>activiti-cloud-services-graphql-stomp</module>
     <module>activiti-cloud-services-graphql-web</module>
     <module>activiti-cloud-services-graphql-ws</module>
-    <module>activiti-cloud-services-graphql-ws-schema</module>
+    <module>activiti-cloud-services-graphql-ws-subscriptions</module>
+    <module>activiti-cloud-services-graphql-notifications</module>
+    <module>activiti-cloud-services-graphql-ws-stomp</module>
     <module>activiti-cloud-services-graphql-ws-security</module>
-    <module>activiti-cloud-services-graphql-schema</module>
+    <module>activiti-cloud-services-graphql-jpa-query</module>
   </modules>
 </project>
