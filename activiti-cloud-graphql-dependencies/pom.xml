@@ -55,6 +55,16 @@
       </dependency>
       <dependency>
         <groupId>org.activiti.cloud.graphql</groupId>
+        <artifactId>activiti-cloud-services-graphql-config</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.activiti.cloud.graphql</groupId>
+        <artifactId>activiti-cloud-services-graphql-schema</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.activiti.cloud.graphql</groupId>
         <artifactId>activiti-cloud-services-graphql-web</artifactId>
         <version>${project.version}</version>
       </dependency>

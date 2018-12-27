@@ -1,10 +1,4 @@
 spring:
-  jpa:
-    hibernate.ddl-auto: create-drop
-    show-sql: true
-  h2:
-    console.enabled: true
-    
   activiti:
     cloud:
       services:

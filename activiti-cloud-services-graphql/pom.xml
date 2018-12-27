@@ -17,5 +17,6 @@
     <module>activiti-cloud-services-graphql-ws</module>
     <module>activiti-cloud-services-graphql-ws-schema</module>
     <module>activiti-cloud-services-graphql-ws-security</module>
+    <module>activiti-cloud-services-graphql-schema</module>
   </modules>
 </project>

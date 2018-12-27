@@ -26,7 +26,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import graphql.ExecutionResult;
 import graphql.GraphQLError;
-import org.activiti.cloud.services.graphql.autoconfigure.EnableActivitiGraphQLQueryService;
 import org.activiti.cloud.services.graphql.web.ActivitiGraphQLController.GraphQLQueryRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,13 +46,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ActivitiGraphQLControllerIT {
 
     private static final String TASK_NAME = "task1";
-    private static final String GRPAPHQL_URL = "/admin/graphql";
+    private static final String GRPAPHQL_URL = "/graphql";
 
     @Autowired
     private TestRestTemplate rest;
 
     @SpringBootApplication
-    @EnableActivitiGraphQLQueryService
     static class Application {
         // Nothing
     }

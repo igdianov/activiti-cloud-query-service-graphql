@@ -16,7 +16,6 @@
 package org.activiti.cloud.services.graphql.autoconfigure;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -26,24 +25,7 @@ import org.springframework.validation.annotation.Validated;
 
 @ConfigurationProperties(prefix="spring.activiti.cloud.services.query.graphql")
 @Validated
-public class ActivitiGraphQLSchemaProperties {
-    /**
-     * Provides the name of GraphQL schema. This is required attribute.
-     */
-    @NotBlank
-    private String name;
-
-    /**
-     * Provides the description of GraphQL schema. Cannot be null.
-     */
-    @NotBlank
-    private String description;
-
-    /**
-     * Specifies type of the GraphQLSchema builder. Reserved for future extension
-     */
-    @NotNull
-    private String type;
+public class ActivitiGraphQLWebProperties {
 
     /**
      * Enable or disable graphql module services.
@@ -57,60 +39,16 @@ public class ActivitiGraphQLSchemaProperties {
     private String path = "/graphql";
 
     @Configuration
-    @PropertySource("classpath:META-INF/graphql.properties")
     @PropertySource(value="classpath:graphql.properties", ignoreResourceNotFound=true)
-    @EnableConfigurationProperties(ActivitiGraphQLSchemaProperties.class)
+    @EnableConfigurationProperties(ActivitiGraphQLWebProperties.class)
     public static class AutoConfiguration {
 
     }
 
-
     /**
      * Default constructor
      */
-    ActivitiGraphQLSchemaProperties() { }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return the description
-     */
-    public String getDescription() {
-        return this.description;
-    }
-
-    /**
-     * @param description the description to set
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * @return the type
-     */
-    public String getType() {
-        return this.type;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
+    ActivitiGraphQLWebProperties() { }
 
     /**
      * @return the enabled

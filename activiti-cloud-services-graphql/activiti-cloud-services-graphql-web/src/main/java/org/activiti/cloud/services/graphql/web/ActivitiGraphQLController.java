@@ -22,11 +22,13 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
+import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaExecutor;
+import graphql.ExecutionResult;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,25 +36,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.introproventures.graphql.jpa.query.schema.GraphQLExecutor;
-import com.introproventures.graphql.jpa.query.schema.impl.GraphQLJpaExecutor;
-
-import graphql.ExecutionResult;
-
 /**
  * Activiti GraphQL Query Spring Rest Controller with HTTP mapping endpoints for GraphQLExecutor relay
  * @see <a href="http://graphql.org/learn/serving-over-http/">Serving GraphQL over HTTP</a>
  */
 @RestController
 @ConditionalOnWebApplication
-@ConditionalOnClass(GraphQLExecutor.class)
 @ConditionalOnProperty(name = "spring.activiti.cloud.services.query.graphql.enabled", matchIfMissing = true)
-@Transactional(readOnly=true) // Fixes unable to access lob stream: 
-							  // Caused by: org.postgresql.util.PSQLException: Large Objects may not be used in auto-commit mode. 
 public class ActivitiGraphQLController {
 
-    private static final String PATH = "${spring.activiti.cloud.services.query.graphql.path:/admin/graphql}";
+    private static final String PATH = "${spring.activiti.cloud.services.query.graphql.path:/graphql}";
     public static final String APPLICATION_GRAPHQL_VALUE = "application/graphql";
 
     private final GraphQLExecutor graphQLExecutor;
