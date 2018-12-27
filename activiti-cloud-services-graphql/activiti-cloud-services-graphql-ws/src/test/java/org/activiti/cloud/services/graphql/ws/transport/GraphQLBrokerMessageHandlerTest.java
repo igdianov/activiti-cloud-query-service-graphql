@@ -16,10 +16,10 @@
 package org.activiti.cloud.services.graphql.ws.transport;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,7 +27,6 @@ import java.security.Principal;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
@@ -200,15 +199,15 @@ public class GraphQLBrokerMessageHandlerTest {
         CountDownLatch completeLatch = new CountDownLatch(1);
 
         // Simulate stomp relay  subscription stream
-        Flux<ExecutionResult> mockStompRelayObservable = Flux.interval(Duration.ZERO, Duration.ofMillis(1))
-                                                                         .take(100)                   
-                                                                         .map(i -> {
-                                                                             Map<String, Object> data = new HashMap<>();
-                                                                             data.put("key", i);
+        Flux<ExecutionResult> mockStompRelayObservable = Flux.interval(Duration.ZERO, Duration.ofMillis(20))
+                                                             .take(100)                   
+                                                             .map(i -> {
+                                                                 Map<String, Object> data = new HashMap<>();
+                                                                 data.put("key", i);
 
-                                                                             return new ExecutionResultImpl(data,
-                                                                                                            Collections.emptyList());
-                                                                         });
+                                                                 return new ExecutionResultImpl(data,
+                                                                                                Collections.emptyList());
+                                                             });
 
         StepVerifier observable = StepVerifier.create(mockStompRelayObservable)
                 .expectNextCount(100)
@@ -223,26 +222,15 @@ public class GraphQLBrokerMessageHandlerTest {
         this.messageHandler.handleMessage(message);
 
         observable.verify(Duration.ofMinutes(2));
+
+        assertThat(completeLatch.await(2000, TimeUnit.MILLISECONDS)).isTrue();
         
         // then
-        verify(this.clientOutboundChannel, times(2)).send(this.messageCaptor.capture());
+        verify(this.clientOutboundChannel, atLeast(100)).send(this.messageCaptor.capture());
 
-        List<Message<GraphQLMessage>> messages = messageCaptor.getAllValues();
-        
-        GraphQLMessage dataMessage = messages.get(0).getPayload();
-
-        assertThat(dataMessage.getType()).isEqualTo(GraphQLMessageType.DATA);
-        assertThat(dataMessage.getId()).isEqualTo("operationId");
-        assertThat(dataMessage.getPayload()).containsKey("data");
-        assertThat(dataMessage.getPayload()
-                                 .get("data")).asList()
-                                              .isNotEmpty();
-
-        GraphQLMessage completeMessage = messages.get(1).getPayload();
+        GraphQLMessage completeMessage = messageCaptor.getValue().getPayload();
 
         assertThat(completeMessage.getType()).isEqualTo(GraphQLMessageType.COMPLETE);
-        
-        assertThat(completeLatch.await(5000, TimeUnit.MILLISECONDS)).isTrue();
     }
 
     @Test
@@ -438,7 +426,6 @@ public class GraphQLBrokerMessageHandlerTest {
 
                 ConnectableFlux<ExecutionResult> connectableObservable = mockStompRelayObservable.share()
                                                                                                        .publish();
-
                 Disposable handle = connectableObservable.connect();
 
                 return connectableObservable.onBackpressureBuffer()

@@ -11,7 +11,7 @@ type Query {
 }
 
 type Subscription {
-    ProcessEngineNotification(
+    engineEvents(
     	serviceName : String, 
     	appName : String, 
     	processDefinitionKey : String,

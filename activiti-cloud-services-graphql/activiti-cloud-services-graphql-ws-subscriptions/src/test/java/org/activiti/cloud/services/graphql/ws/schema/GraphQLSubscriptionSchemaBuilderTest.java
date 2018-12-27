@@ -17,8 +17,6 @@ package org.activiti.cloud.services.graphql.ws.schema;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.activiti.cloud.services.graphql.ws.schema.GraphQLSubscriptionSchemaBuilder;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class GraphQLSubscriptionSchemaBuilderTest {
@@ -30,7 +28,7 @@ public class GraphQLSubscriptionSchemaBuilderTest {
         assertThat(schemaBuilder.getGraphQLSchema()).isNotNull();
         assertThat(schemaBuilder.getGraphQLSchema().getSubscriptionType()).isNotNull();
         assertThat(schemaBuilder.getGraphQLSchema().getSubscriptionType().getName()).isEqualTo("Subscription");
-        assertThat(schemaBuilder.getGraphQLSchema().getSubscriptionType().getFieldDefinition("ProcessEngineNotification")).isNotNull();
+        assertThat(schemaBuilder.getGraphQLSchema().getSubscriptionType().getFieldDefinition("engineEvents")).isNotNull();
     }
 
     @Test

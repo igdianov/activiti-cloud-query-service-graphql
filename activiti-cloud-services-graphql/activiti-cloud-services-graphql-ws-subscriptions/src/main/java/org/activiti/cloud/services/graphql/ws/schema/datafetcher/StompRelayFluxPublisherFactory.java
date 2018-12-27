@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.stomp.ReactorNettyTcpStompClient;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
-import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.UnicastProcessor;
 
@@ -62,18 +61,20 @@ public class StompRelayFluxPublisherFactory implements StompRelayPublisherFactor
             stompClient.connect(stompHeaders, handler);
         });
 
-        ConnectableFlux<Map<String, Object>> connectableFlux =
-                stompRelayObservable
-                    .share()
-                    .publish();
+        return stompRelayObservable.share();
+        
+//        ConnectableFlux<Map<String, Object>> connectableFlux =
+//                stompRelayObservable
+//                    .share()
+//                    .publish();
 
-        reactor.core.Disposable handle = connectableFlux.connect();
+        //reactor.core.Disposable handle = connectableFlux.connect();
 
-        return connectableFlux
-                .onBackpressureDrop()
-                .doOnCancel(() -> {
-                    handle.dispose();
-                });
+//        return connectableFlux
+//                .onBackpressureDrop()
+//                .doOnCancel(() -> {
+//                    handle.dispose();
+//                });
     }
 
 

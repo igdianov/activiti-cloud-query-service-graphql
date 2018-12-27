@@ -15,9 +15,7 @@
  */
 package org.activiti.cloud.services.graphql.ws.transport;
 
-import java.time.Duration;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -57,14 +55,15 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
 
 		publishSubject
 			.map(ExecutionResult::getData)
-			.bufferTimeout(bufferCount, Duration.ofMillis(bufferTimeSpanMs))
 			.subscribe(this::sendDataToClient);
 	}
 
 	public void cancel() {
         Subscription subscription = subscriptionRef.get();
         if (subscription != null) {
-            subscription.cancel();
+            try {
+                subscription.cancel();
+            } catch(Exception ignore) { }
         }
 	}
 
@@ -115,16 +114,14 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
         }
     }
 
-    protected void sendDataToClient(List<Object> data) {
-    	if(data.size() > 0) {
-		    Map<String, Object> payload = Collections.singletonMap("data", data);
-		    GraphQLMessage operationData = new GraphQLMessage(operationMessageId, GraphQLMessageType.DATA, payload);
+    protected void sendDataToClient(Object data) {
+	    Map<String, Object> payload = Collections.singletonMap("data", data);
+	    GraphQLMessage operationData = new GraphQLMessage(operationMessageId, GraphQLMessageType.DATA, payload);
 
-			Message<?> responseMessage = MessageBuilder.createMessage(operationData, headerAccessor.getMessageHeaders());
+		Message<?> responseMessage = MessageBuilder.createMessage(operationData, headerAccessor.getMessageHeaders());
 
-			// Send message directly to user
-		    outboundChannel.send(responseMessage);
-    	}
+		// Send message directly to user
+	    outboundChannel.send(responseMessage);
     }
 
 }

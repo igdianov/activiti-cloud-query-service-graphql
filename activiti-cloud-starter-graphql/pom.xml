@@ -110,6 +110,12 @@
       <artifactId>spring-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>io.leangen.graphql</groupId>
+      <artifactId>spqr</artifactId>
+      <version>0.9.7</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <profiles>
     <profile>
