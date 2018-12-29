@@ -22,10 +22,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.activiti.cloud.services.graphql.ws.schema.datafetcher.GraphQLStompRelayDataFetcherDestinationResolver;
-import org.junit.Before;
-import org.junit.Test;
-
 import graphql.execution.ExecutionContext;
 import graphql.language.Field;
 import graphql.schema.DataFetchingEnvironment;
@@ -34,17 +30,19 @@ import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLOutputType;
+import org.junit.Before;
+import org.junit.Test;
 
 
 public class GraphQLStompRelayDataFetcherDestinationResolverTest {
 
-    private GraphQLStompRelayDataFetcherDestinationResolver testSubject;
+    private StompRelayDestinationResolver testSubject;
 
     private GraphQLFieldDefinition fieldDefinition;
 
     @Before
     public void setUp() throws Exception {
-        this.testSubject = new GraphQLStompRelayDataFetcherDestinationResolver(new String[] {"arg1", "arg2"});
+        this.testSubject = new StompRelayDestinationResolver();
 
         this.fieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
                 .name("Field")

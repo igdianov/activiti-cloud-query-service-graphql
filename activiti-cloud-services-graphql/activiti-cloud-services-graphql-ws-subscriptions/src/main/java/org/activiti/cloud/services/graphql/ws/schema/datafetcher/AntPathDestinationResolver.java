@@ -15,24 +15,29 @@
  */
 package org.activiti.cloud.services.graphql.ws.schema.datafetcher;
 
-import java.util.Map;
+public class AntPathDestinationResolver extends AbstractDestinationResolver {
 
-import graphql.schema.DataFetcher;
-import graphql.schema.DataFetchingEnvironment;
-import org.reactivestreams.Publisher;
+    private static final String HASH = "**";
+    private static final String WILDCARD = "*";
+    private static final String DOT = ".";
 
-public class StompRelayDataFetcher implements DataFetcher<Publisher<Map<String,Object>>>{
-
-	private final StompRelayPublisherFactory stompRelayPublisherFactory;
-
-	public StompRelayDataFetcher(StompRelayPublisherFactory stompRelayPublisherFactory) {
-		 this.stompRelayPublisherFactory = stompRelayPublisherFactory;
-	}
-
-	@Override
-	public Publisher<Map<String,Object>> get(DataFetchingEnvironment environment) {
-
-        return stompRelayPublisherFactory.getPublisher(environment);
+    public AntPathDestinationResolver() {
     }
+
+    @Override
+    protected String any() {
+        return HASH;
+    }
+
+    @Override
+    protected String wildcard() {
+        return WILDCARD;
+    }
+
+    @Override
+    protected String path() {
+        return DOT;
+    }
+
 
 }

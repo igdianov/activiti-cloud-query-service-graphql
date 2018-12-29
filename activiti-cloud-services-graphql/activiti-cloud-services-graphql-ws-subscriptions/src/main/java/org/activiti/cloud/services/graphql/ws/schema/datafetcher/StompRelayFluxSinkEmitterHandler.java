@@ -17,8 +17,8 @@ package org.activiti.cloud.services.graphql.ws.schema.datafetcher;
 
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
+import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -34,7 +34,7 @@ public class StompRelayFluxSinkEmitterHandler extends StompSessionHandlerAdapter
     private static Logger log = LoggerFactory.getLogger(StompRelayFluxSinkEmitterHandler.class);
 
 	private final List<String> destinations;
-	private final FluxSink<Map<String, Object>> emitter;
+	private final FluxSink<EngineEvent> emitter;
 
 	private StompSession session;
 
@@ -42,7 +42,7 @@ public class StompRelayFluxSinkEmitterHandler extends StompSessionHandlerAdapter
 	 * @param destinations
 	 * @param emitter
 	 */
-	public StompRelayFluxSinkEmitterHandler(List<String> destinations, FluxSink<Map<String, Object>> emitter) {
+	public StompRelayFluxSinkEmitterHandler(List<String> destinations, FluxSink<EngineEvent> emitter) {
 		this.destinations = destinations;
 		this.emitter = emitter;
 
@@ -51,7 +51,7 @@ public class StompRelayFluxSinkEmitterHandler extends StompSessionHandlerAdapter
 
 	@Override
 	public Type getPayloadType(StompHeaders headers) {
-		return Map.class;
+		return EngineEvent.class;
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class StompRelayFluxSinkEmitterHandler extends StompSessionHandlerAdapter
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void handleFrame(StompHeaders headers, Object payload) {
-		emitter.next((Map) payload);
+		emitter.next((EngineEvent) payload);
 	}
 
 	@Override

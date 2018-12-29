@@ -13,16 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.cloud.services.query.graphql.notifications.graphql;
+package org.activiti.cloud.services.query.graphql.notifications.model;
 
-import org.activiti.cloud.services.query.graphql.notifications.model.ProcessEngineNotification;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.activiti.cloud.services.query.graphql.notifications.producer.SpELTemplateRoutingKey;
 
 @SpELTemplateRoutingKey("engineEvents.#{['serviceName']?:'_'}.#{['appName']?:'_'}.#{['processDefinitionKey']?:'_'}.#{['processInstanceId']?:'_'}.#{['businessKey']?:'_'}")
-public class GraphQLProcessEngineNotification extends ProcessEngineNotification {
+public class EngineEvent extends LinkedHashMap<String, Object>{
 
     /**
      * serialVersionUID
      */
     private static final long serialVersionUID = 1L;
+
+    public EngineEvent() {
+        super();
+    }
+
+    public EngineEvent(Map<? extends String, ? extends Object> m) {
+        super(m);
+    }
 
 }

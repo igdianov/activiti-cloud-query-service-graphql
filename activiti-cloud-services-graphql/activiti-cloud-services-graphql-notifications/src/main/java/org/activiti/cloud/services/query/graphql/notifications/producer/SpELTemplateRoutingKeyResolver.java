@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.cloud.services.query.graphql.notifications.graphql;
+package org.activiti.cloud.services.query.graphql.notifications.producer;
 
 import java.lang.annotation.Annotation;
 

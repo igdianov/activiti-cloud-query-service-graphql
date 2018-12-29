@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.cloud.services.graphql.ws.schema.datafetcher;
+package org.activiti.cloud.services.query.graphql.notifications.producer;
 
-import java.util.Map;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import graphql.schema.DataFetchingEnvironment;
-import org.reactivestreams.Publisher;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-public interface StompRelayPublisherFactory {
-
-    public Publisher<Map<String,Object>> getPublisher(DataFetchingEnvironment environment);
-
+@Retention(RUNTIME)
+@Target(TYPE)
+public @interface SpELTemplateRoutingKey {
+	String value();
 }

@@ -29,11 +29,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.activiti.cloud.services.query.graphql.notifications.config.ActivitiNotificationsGatewayProperties;
-import org.activiti.cloud.services.query.graphql.notifications.consumer.ProcessEngineNotificationTransformer;
-import org.activiti.cloud.services.query.graphql.notifications.graphql.GraphQLProcessEngineNotification;
-import org.activiti.cloud.services.query.graphql.notifications.graphql.GraphQLProcessEngineNotificationTransformer;
-import org.activiti.cloud.services.query.graphql.notifications.model.ProcessEngineNotification;
+import org.activiti.cloud.services.query.graphql.notifications.config.NotificationsConsumerProperties;
+import org.activiti.cloud.services.query.graphql.notifications.consumer.DefaultEngineEventsTransformer;
+import org.activiti.cloud.services.query.graphql.notifications.consumer.EngineEventsTransformer;
+import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -43,16 +42,16 @@ public class GraphQLProcessEngineNotificationTransformerTest {
 
     private static Logger LOGGER = LoggerFactory.getLogger(GraphQLProcessEngineNotificationTransformerTest.class);
 
-    private ActivitiNotificationsGatewayProperties properties = new ActivitiNotificationsGatewayProperties();
+    private NotificationsConsumerProperties properties = new NotificationsConsumerProperties();
     
-    private ProcessEngineNotificationTransformer subject;
+    private EngineEventsTransformer subject;
 
     @Before
     public void setUp() {
         String engineEventAttributeKeys = properties.getProcessEngineEventAttributeKeys();
         String eventTypeKey = properties.getProcessEngineEventTypeKey();
 
-    	subject = new GraphQLProcessEngineNotificationTransformer(
+    	subject = new DefaultEngineEventsTransformer(
                 Arrays.asList(engineEventAttributeKeys.split(",")), eventTypeKey);
     }
     
@@ -63,7 +62,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
         List<Map<String, Object>> events = new ArrayList<Map<String, Object>>() {
             private static final long serialVersionUID = 1L;
         {
-            add(new GraphQLProcessEngineNotification() {
+            add(new EngineEvent() {
                 private static final long serialVersionUID = 1L;
             {
                 put("serviceName","rb");
@@ -76,7 +75,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
                 put("entityId","e1");
             }});
 
-            add(new GraphQLProcessEngineNotification() {
+            add(new EngineEvent() {
                 private static final long serialVersionUID = 1L;
             {
                 put("serviceName","rb");
@@ -89,7 +88,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
                 put("entityId","e1");
             }});
 
-            add(new GraphQLProcessEngineNotification() {
+            add(new EngineEvent() {
                 private static final long serialVersionUID = 1L;
             {
                 put("serviceName","rb");
@@ -102,7 +101,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
                 put("entityId","e1");
             }});
 
-            add(new GraphQLProcessEngineNotification() {
+            add(new EngineEvent() {
                 private static final long serialVersionUID = 1L;
             {
                 put("serviceName","rb1");
@@ -118,7 +117,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
         }};
 
         // when
-        List<ProcessEngineNotification> notifications = subject.transform(events);
+        List<EngineEvent> notifications = subject.transform(events);
 
         LOGGER.info("\n{}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(notifications));
 
@@ -144,7 +143,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
         List<Map<String, Object>> events = new ArrayList<Map<String, Object>>() {
             private static final long serialVersionUID = 1L;
         {
-            add(new GraphQLProcessEngineNotification() {
+            add(new EngineEvent() {
                 private static final long serialVersionUID = 1L;
             {
                 put("serviceName", null);
@@ -157,7 +156,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
                 put("entityId","e1");
             }});
 
-            add(new GraphQLProcessEngineNotification() {
+            add(new EngineEvent() {
                 private static final long serialVersionUID = 1L;
             {
                 put("serviceName","rb");
@@ -170,7 +169,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
                 put("entityId","e1");
             }});
 
-            add(new GraphQLProcessEngineNotification() {
+            add(new EngineEvent() {
                 private static final long serialVersionUID = 1L;
             {
                 put("serviceName","rb");
@@ -183,7 +182,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
                 put("entityId","e1");
             }});
 
-            add(new GraphQLProcessEngineNotification() {
+            add(new EngineEvent() {
                 private static final long serialVersionUID = 1L;
             {
                 put("serviceName","rb1");
@@ -199,7 +198,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
         }};
 
         // when
-        List<ProcessEngineNotification> notifications = subject.transform(events);
+        List<EngineEvent> notifications = subject.transform(events);
 
         LOGGER.info("\n{}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(notifications));
 
@@ -213,7 +212,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
         List<Map<String, Object>> events = new ArrayList<Map<String, Object>>() {
             private static final long serialVersionUID = 1L;
         {
-            add(new GraphQLProcessEngineNotification() {
+            add(new EngineEvent() {
                 private static final long serialVersionUID = 1L;
             {
                 // put("serviceName","rb"); <- missing
@@ -226,7 +225,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
                 put("entityId","e1");
             }});
 
-            add(new GraphQLProcessEngineNotification() {
+            add(new EngineEvent() {
                 private static final long serialVersionUID = 1L;
             {
                 put("serviceName","rb");
@@ -239,7 +238,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
                 put("entityId","e1");
             }});
 
-            add(new GraphQLProcessEngineNotification() {
+            add(new EngineEvent() {
                 private static final long serialVersionUID = 1L;
             {
                 put("serviceName","rb");
@@ -252,7 +251,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
                 put("entityId","e1");
             }});
 
-            add(new GraphQLProcessEngineNotification() {
+            add(new EngineEvent() {
                 private static final long serialVersionUID = 1L;
             {
                 put("serviceName","rb1");
@@ -268,7 +267,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
         }};
 
         // when
-        List<ProcessEngineNotification> notifications = subject.transform(events);
+        List<EngineEvent> notifications = subject.transform(events);
 
         LOGGER.info("\n{}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(notifications));
 
@@ -286,7 +285,7 @@ public class GraphQLProcessEngineNotificationTransformerTest {
     	JsonNode jsonNode = new ObjectMapper().readTree(json);
     	
         // when
-        List<ProcessEngineNotification> notifications = subject.transform(events);
+        List<EngineEvent> notifications = subject.transform(events);
         
         LOGGER.info("\n{}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(notifications));
 

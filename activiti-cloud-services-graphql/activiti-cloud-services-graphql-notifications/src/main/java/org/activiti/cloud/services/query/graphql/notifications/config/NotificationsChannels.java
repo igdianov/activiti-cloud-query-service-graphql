@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.cloud.services.query.graphql.notifications.model;
+package org.activiti.cloud.services.query.graphql.notifications.config;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 
-public abstract class ProcessEngineNotification extends LinkedHashMap<String, Object>{
+import org.springframework.cloud.stream.annotation.Input;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.SubscribableChannel;
 
-    /**
-     * serialVersionUID
-     */
-    private static final long serialVersionUID = 1L;
+public interface NotificationsChannels {
 
-    public ProcessEngineNotification() {
-        super();
-    }
+    String NOTIFICATIONS_GATEWAY = "notificatonsGateway";
 
-    public ProcessEngineNotification(Map<? extends String, ? extends Object> m) {
-        super(m);
-    }
+    String NOTIFICATIONS_CONSUMER = "notificationsConsumer";
+
+    @Input(NOTIFICATIONS_CONSUMER)
+    SubscribableChannel notificationsConsumer();
+
+    @Output(NOTIFICATIONS_GATEWAY)
+    MessageChannel notificationsGateway();
 
 }

@@ -17,9 +17,8 @@ package org.activiti.cloud.services.query.graphql.notifications;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.activiti.cloud.services.query.graphql.notifications.graphql.GraphQLProcessEngineNotification;
-import org.activiti.cloud.services.query.graphql.notifications.graphql.SpELTemplateRoutingKeyResolver;
-import org.activiti.cloud.services.query.graphql.notifications.model.ProcessEngineNotification;
+import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
+import org.activiti.cloud.services.query.graphql.notifications.producer.SpELTemplateRoutingKeyResolver;
 import org.junit.Test;
 
 public class SpELRoutingKeyTest {
@@ -29,7 +28,7 @@ public class SpELRoutingKeyTest {
     public void testRoutingKey () {
         RoutingKeyResolver routingKeyResolver = new SpELTemplateRoutingKeyResolver();
 
-        ProcessEngineNotification notification = new GraphQLProcessEngineNotification();
+        EngineEvent notification = new EngineEvent();
 
         notification.put("serviceName", "my-rb");
         notification.put("appName","app");

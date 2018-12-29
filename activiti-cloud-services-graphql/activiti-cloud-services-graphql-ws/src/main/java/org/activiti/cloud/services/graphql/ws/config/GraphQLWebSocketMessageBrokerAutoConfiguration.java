@@ -127,11 +127,13 @@ public class GraphQLWebSocketMessageBrokerAutoConfiguration {
         @Bean
         public ServletServerContainerFactoryBean createWebSocketContainer() {
             ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
+            org.springframework.scheduling.concurrent.ConcurrentTaskExecutor f;
+            
             container.setMaxTextMessageBufferSize(1024*64);
             container.setMaxBinaryMessageBufferSize(1024*10);
             container.setMaxSessionIdleTimeout(30000L);
             return container;
-        }          
+        }
     }
-
+    
 }

@@ -22,7 +22,7 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties(prefix="spring.activiti.cloud.services.notifications.gateway")
-public class ActivitiNotificationsGatewayProperties {
+public class NotificationsConsumerProperties {
 
     /**
      * Enable or disable notification module services.
@@ -42,7 +42,7 @@ public class ActivitiNotificationsGatewayProperties {
     private String processEngineEventTypeKey = "eventType";
 
 
-    public ActivitiNotificationsGatewayProperties() {
+    public NotificationsConsumerProperties() {
         // default constructor
     }
 

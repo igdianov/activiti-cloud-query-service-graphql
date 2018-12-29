@@ -16,9 +16,9 @@
 package org.activiti.cloud.services.graphql.ws.schema.datafetcher;
 
 import java.util.List;
-import java.util.Map;
 
 import graphql.schema.DataFetchingEnvironment;
+import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,12 +28,11 @@ import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.UnicastProcessor;
 
-public class StompRelayFluxPublisherFactory implements StompRelayPublisherFactory {
+public class StompRelayFluxPublisherFactory implements EngineEventsPublisherFactory {
 
     private static Logger log = LoggerFactory.getLogger(StompRelayFluxPublisherFactory.class);
 
-    private StompRelayDestinationResolver destinationResolver =
-            new SimpleStompRelayDataFetcherDestinationResolver();
+    private DataFetcherDestinationResolver destinationResolver = new StompRelayDestinationResolver();
 
     private String login = "guest";
     private String passcode = "guest";
@@ -45,10 +44,10 @@ public class StompRelayFluxPublisherFactory implements StompRelayPublisherFactor
     }
     
     @Override
-    public Publisher<Map<String,Object>> getPublisher(DataFetchingEnvironment environment) {
+    public Publisher<EngineEvent> getPublisher(DataFetchingEnvironment environment) {
         
         
-        Flux<Map<String,Object>> stompRelayObservable = UnicastProcessor.create(emitter -> {
+        Flux<EngineEvent> stompRelayObservable = UnicastProcessor.create(emitter -> {
 
             List<String> destinations = destinationResolver.resolveDestinations(environment);
 
@@ -62,19 +61,6 @@ public class StompRelayFluxPublisherFactory implements StompRelayPublisherFactor
         });
 
         return stompRelayObservable.share();
-        
-//        ConnectableFlux<Map<String, Object>> connectableFlux =
-//                stompRelayObservable
-//                    .share()
-//                    .publish();
-
-        //reactor.core.Disposable handle = connectableFlux.connect();
-
-//        return connectableFlux
-//                .onBackpressureDrop()
-//                .doOnCancel(() -> {
-//                    handle.dispose();
-//                });
     }
 
 
@@ -94,7 +80,7 @@ public class StompRelayFluxPublisherFactory implements StompRelayPublisherFactor
     /**
      * @param destinationResolver
      */
-    public StompRelayFluxPublisherFactory destinationResolver(StompRelayDestinationResolver destinationResolver) {
+    public StompRelayFluxPublisherFactory destinationResolver(DataFetcherDestinationResolver destinationResolver) {
         this.destinationResolver = destinationResolver;
 
         return this;

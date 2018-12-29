@@ -15,8 +15,8 @@
  */
 package org.activiti.cloud.services.query.graphql.notifications;
 
-import org.activiti.cloud.services.query.graphql.notifications.config.NotificationsGatewayChannels;
-import org.activiti.cloud.services.query.graphql.notifications.model.ProcessEngineNotification;
+import org.activiti.cloud.services.query.graphql.notifications.config.NotificationsChannels;
+import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.GatewayHeader;
 import org.springframework.integration.annotation.MessagingGateway;
@@ -26,9 +26,9 @@ import org.springframework.messaging.handler.annotation.Payload;
 @MessagingGateway
 public interface NotificationsGateway {
 
-    @Gateway(requestChannel = NotificationsGatewayChannels.NOTIFICATIONS_GATEWAY,
+    @Gateway(requestChannel = NotificationsChannels.NOTIFICATIONS_GATEWAY,
         headers={@GatewayHeader(name="content-type", value="application/json")}
     )
-    public void send(@Payload ProcessEngineNotification notification, @Header("routingKey") String routingKey);
+    public void send(@Payload EngineEvent notification, @Header("routingKey") String routingKey);
 
 }

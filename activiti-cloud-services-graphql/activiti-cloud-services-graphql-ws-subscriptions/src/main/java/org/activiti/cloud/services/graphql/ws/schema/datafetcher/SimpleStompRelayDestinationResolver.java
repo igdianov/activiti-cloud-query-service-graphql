@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import graphql.schema.DataFetchingEnvironment;
 
-public class SimpleStompRelayDataFetcherDestinationResolver implements StompRelayDestinationResolver {
+public class SimpleStompRelayDestinationResolver implements DataFetcherDestinationResolver {
 
 	@SuppressWarnings("unchecked")
 	@Override

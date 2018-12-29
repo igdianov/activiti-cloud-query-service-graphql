@@ -18,8 +18,8 @@ package org.activiti.cloud.services.query.graphql.notifications.consumer;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.cloud.services.query.graphql.notifications.model.ProcessEngineNotification;
+import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
 
-public interface ProcessEngineNotificationTransformer {
-    List<ProcessEngineNotification> transform(List<Map<String,Object>> events);
+public interface EngineEventsTransformer {
+    List<EngineEvent> transform(List<Map<String,Object>> events);
 }

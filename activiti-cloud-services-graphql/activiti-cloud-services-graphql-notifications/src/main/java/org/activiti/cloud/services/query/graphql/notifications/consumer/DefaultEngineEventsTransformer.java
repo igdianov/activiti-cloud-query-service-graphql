@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.cloud.services.query.graphql.notifications.graphql;
+package org.activiti.cloud.services.query.graphql.notifications.consumer;
 
 import java.util.AbstractMap;
 import java.util.List;
@@ -22,8 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.activiti.cloud.services.query.graphql.notifications.consumer.ProcessEngineNotificationTransformer;
-import org.activiti.cloud.services.query.graphql.notifications.model.ProcessEngineNotification;
+import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
 
 /**
  * Transform flat list of engine events maps into hierarchical structure
@@ -31,25 +30,25 @@ import org.activiti.cloud.services.query.graphql.notifications.model.ProcessEngi
  * i.e. [{processInstanceId, serviceName, appName, processDefinitionId, eventType:[{attr1, attr2, ...}]}, ... ]
  *
  */
-public class GraphQLProcessEngineNotificationTransformer implements ProcessEngineNotificationTransformer {
+public class DefaultEngineEventsTransformer implements EngineEventsTransformer {
 
     private final String[] attributeKeys;
     private final String eventTypeKey;
 
-    public GraphQLProcessEngineNotificationTransformer(List<String> attributeList, String eventTypeKey) {
+    public DefaultEngineEventsTransformer(List<String> attributeList, String eventTypeKey) {
         this.attributeKeys = attributeList.toArray(new String[] {});
         this.eventTypeKey = eventTypeKey;
     }
 
     @Override
-    public List<ProcessEngineNotification> transform(List<Map<String,Object>> events) {
+    public List<EngineEvent> transform(List<Map<String,Object>> events) {
         return events.stream()
                 .filter(this::isValid)
                 .collect(Collectors.groupingBy(this::processEngineEventAttributes, Collectors.groupingBy(this::eventType)))
                 .entrySet()
                     .stream()
                     .map(entry -> Stream.of(entry.getKey(), entry.getValue())
-                         .collect(GraphQLProcessEngineNotification::new, Map::putAll, Map::putAll)
+                         .collect(EngineEvent::new, Map::putAll, Map::putAll)
                     )
                     .collect(Collectors.toList());
     }

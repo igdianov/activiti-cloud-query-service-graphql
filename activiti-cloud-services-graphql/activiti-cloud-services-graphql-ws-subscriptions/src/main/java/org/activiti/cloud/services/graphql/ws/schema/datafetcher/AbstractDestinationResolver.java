@@ -23,38 +23,53 @@ import java.util.stream.Stream;
 
 import graphql.schema.DataFetchingEnvironment;
 
-public class GraphQLStompRelayDataFetcherDestinationResolver implements StompRelayDestinationResolver {
+public abstract class AbstractDestinationResolver implements DataFetcherDestinationResolver {
 
-    private static final String HASH = "#";
-    private static final String WILDCARD = "*";
-    private static final String DOT = ".";
-
-    private final String[] argumentNames;
-
-    public GraphQLStompRelayDataFetcherDestinationResolver(String[] argumentNames) {
-        this.argumentNames = argumentNames;
+    public AbstractDestinationResolver() {
     }
+    
+    protected abstract String any();
+    protected abstract String wildcard();
+    protected abstract String path();
 
 	@Override
 	public List<String> resolveDestinations(DataFetchingEnvironment environment) {
-		String fieldName = environment.getFields().iterator().next().getName();
+		String fieldName = resolveFieldName(environment);
+		
+        String[] argumentNames = resolveArgumentNames(environment);
+		
 		List<String> destinations = new ArrayList<>();
 
-		String destination = HASH;
+		String destination = any();
 
 		// Build stomp destination from arguments
 		if(environment.getArguments().size() > 0) {
 
 		    destination = Stream.of(argumentNames)
 		        .map(name -> resolveArgument(environment, name))
-                .map(value -> value.orElse(WILDCARD))
-                .collect(Collectors.joining(DOT));
+                .map(value -> value.orElse(wildcard()))
+                .collect(Collectors.joining(path()));
         }
 
-        destinations.add(fieldName+DOT+destination);
+        destinations.add(fieldName+path()+destination);
 
 		return destinations;
 	}
+	
+	protected String resolveFieldName(DataFetchingEnvironment environment) {
+        return environment.getFields().iterator().next().getName();
+	    
+	}
+	
+
+	protected String[] resolveArgumentNames(DataFetchingEnvironment environment) {
+        return environment.getFieldDefinition()
+                .getArguments()
+                .stream()
+                .map(arg -> arg.getName())
+                .toArray(String[]::new);
+	}
+	
 
 	private Optional<String> resolveArgument(DataFetchingEnvironment environment, String arumentName) {
 	    return Optional.ofNullable(environment.getArgument(arumentName));

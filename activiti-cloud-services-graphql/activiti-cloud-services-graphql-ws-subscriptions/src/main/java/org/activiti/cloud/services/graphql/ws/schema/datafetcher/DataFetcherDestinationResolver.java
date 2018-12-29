@@ -15,27 +15,12 @@
  */
 package org.activiti.cloud.services.graphql.ws.schema.datafetcher;
 
-public class StompRelayDestinationResolver extends AbstractDestinationResolver  {
+import java.util.List;
 
-    private static final String HASH = "#";
-    private static final String WILDCARD = "*";
-    private static final String DOT = ".";
+import graphql.schema.DataFetchingEnvironment;
 
-    public StompRelayDestinationResolver() {
-    }
+public interface DataFetcherDestinationResolver {
 
-    @Override
-    protected String any() {
-        return HASH;
-    }
+	List<String> resolveDestinations(DataFetchingEnvironment environment);
 
-    @Override
-    protected String wildcard() {
-        return WILDCARD;
-    }
-
-    @Override
-    protected String path() {
-        return DOT;
-    }
 }

@@ -29,7 +29,9 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import reactor.core.publisher.DirectProcessor;
+import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.UnicastProcessor;
 
 public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResult>{
 
@@ -41,9 +43,11 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
 
 	private final String operationMessageId;
 
-	private final DirectProcessor<ExecutionResult> publishSubject = DirectProcessor.create();
+	private final UnicastProcessor<ExecutionResult> processor = UnicastProcessor.create();
 
     private final AtomicReference<Subscription> subscriptionRef = new AtomicReference<>();
+    
+    private final Disposable control;
 
 	public GraphQLBrokerChannelSubscriber(Message<?> message,  String operationMessageId,
 			MessageChannel outboundChannel,
@@ -53,13 +57,18 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
 		this.operationMessageId = operationMessageId;
 		this.headerAccessor = SimpMessageHeaderAccessor.getMutableAccessor(message);
 
-		publishSubject
-			.map(ExecutionResult::getData)
-			.subscribe(this::sendDataToClient);
+        this.control = Flux.from(processor)
+                           .map(ExecutionResult::getData)
+                           .subscribe(this::sendDataToClient);
 	}
 
 	public void cancel() {
+	    control.dispose();
+	    
         Subscription subscription = subscriptionRef.get();
+
+        log.info("Cancel subscription {}", subscription);
+        
         if (subscription != null) {
             try {
                 subscription.cancel();
@@ -69,20 +78,22 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
 
     @Override
     public void onSubscribe(Subscription s) {
+        log.info("New subscription: {}", s);
         subscriptionRef.set(s);
         requestNext(1);
     }
 
     @Override
     public void onNext(ExecutionResult executionResult) {
-    	publishSubject.onNext(executionResult);
+        log.debug("Process {} executionResult {} ", subscriptionRef.get(), executionResult);
+    	processor.onNext(executionResult);
 
         requestNext(1);
     }
 
     @Override
     public void onError(Throwable t) {
-        log.error("Subscription threw an exception", t);
+        log.error("Subscription {} threw an exception {}", subscriptionRef.get(), t);
 
         Map<String, Object> payload = Collections.singletonMap("errors", Collections.singletonList(t.getMessage()));
 
@@ -96,7 +107,7 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
 
     @Override
     public void onComplete() {
-        log.info("Subscription complete");
+        log.info("Subscription complete: {}", subscriptionRef.get());
 
         cancel();
 

@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.cloud.services.query.graphql.notifications.graphql;
+package org.activiti.cloud.services.graphql.ws.schema.datafetcher;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import graphql.schema.DataFetchingEnvironment;
+import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
+import org.reactivestreams.Publisher;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+public interface EngineEventsPublisherFactory {
 
-@Retention(RUNTIME)
-@Target(TYPE)
-public @interface SpELTemplateRoutingKey {
-	String value();
+    public Publisher<EngineEvent> getPublisher(DataFetchingEnvironment environment);
+
 }
