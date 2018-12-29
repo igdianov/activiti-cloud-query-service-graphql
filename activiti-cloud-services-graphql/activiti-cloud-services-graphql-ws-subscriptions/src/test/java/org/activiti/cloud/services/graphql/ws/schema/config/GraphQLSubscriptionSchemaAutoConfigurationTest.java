@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.activiti.cloud.services.graphql.ws.schema.GraphQLSubscriptionSchemaBuilder;
 import org.activiti.cloud.services.graphql.ws.schema.GraphQLSubscriptionSchemaProperties;
 import org.activiti.cloud.services.graphql.ws.schema.datafetcher.EngineEventsPublisherDataFetcher;
-import org.activiti.cloud.services.graphql.ws.schema.datafetcher.DataFetcherDestinationResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +38,6 @@ public class GraphQLSubscriptionSchemaAutoConfigurationTest {
 
     @Autowired
     private GraphQLSubscriptionSchemaBuilder graphQLSubscriptionSchemaBuilder;
-
-    @Autowired
-    private DataFetcherDestinationResolver stompRelayDestinationResolver;
 
     @Autowired
     private EngineEventsPublisherDataFetcher stompRelayDataFetcher;

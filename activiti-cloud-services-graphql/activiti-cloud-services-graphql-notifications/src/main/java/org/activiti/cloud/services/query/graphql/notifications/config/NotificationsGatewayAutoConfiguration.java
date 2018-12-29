@@ -38,8 +38,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.integration.annotation.IntegrationComponentScan;
-import reactor.core.Disposable;
-import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.WorkQueueProcessor;
@@ -119,35 +117,36 @@ public class NotificationsGatewayAutoConfiguration {
     @Configuration
     static class EngineEventsFluxSubscribersConfigurer implements SmartLifecycle {
 
-        private final ConnectableFlux<EngineEvent> connectableEngineEventsFlux;
+        private final Flux<EngineEvent> connectableEngineEventsFlux;
         
         private List<Subscriber<EngineEvent>> subscribers = new ArrayList<>();
-
-        private Disposable control;        
+        
+        boolean running;
 
         @Autowired
         public EngineEventsFluxSubscribersConfigurer(Flux<EngineEvent> engineEventsFlux) {
-            this.connectableEngineEventsFlux = engineEventsFlux.publish();
+            this.connectableEngineEventsFlux = Flux.from(engineEventsFlux);
         }
         
         @Autowired(required=false)
         public void setSubscribers(List<Subscriber<EngineEvent>> subscribers) {
-            subscribers.forEach(s -> connectableEngineEventsFlux.subscribe(s));
+            this.subscribers.addAll(subscribers);
         }
         
         @Override
         public void start() {
-           this.control = connectableEngineEventsFlux.connect();
+            subscribers.forEach(s -> connectableEngineEventsFlux.subscribe(s));
+            running = true;
         }
 
         @Override
         public void stop() {
-            this.control.dispose();
+            running = false;
         }
 
         @Override
         public boolean isRunning() {
-            return this.control != null;
+            return running;
         }
     }
 }
