@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.MessageHeaderAccessor;
@@ -39,7 +40,7 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
 
 	private final MessageChannel outboundChannel;
 
-	private final MessageHeaderAccessor headerAccessor;
+	private final Message<?> message;
 
 	private final String operationMessageId;
 
@@ -55,7 +56,7 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
 	{
 		this.outboundChannel = outboundChannel;
 		this.operationMessageId = operationMessageId;
-		this.headerAccessor = SimpMessageHeaderAccessor.getMutableAccessor(message);
+		this.message = message;
 
         this.control = Flux.from(processor)
                            .map(ExecutionResult::getData)
@@ -101,7 +102,7 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
         GraphQLMessage operationMessage = new GraphQLMessage(operationMessageId, GraphQLMessageType.ERROR, payload);
 
 		Message<GraphQLMessage> responseMessage =
-				MessageBuilder.createMessage(operationMessage, headerAccessor.getMessageHeaders());
+				MessageBuilder.createMessage(operationMessage, getMessageHeaders());
 
 		outboundChannel.send(responseMessage);
     }
@@ -114,7 +115,7 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
 
         GraphQLMessage operationMessage = new GraphQLMessage(operationMessageId, GraphQLMessageType.COMPLETE, Collections.emptyMap());
 
-		Message<?> responseMessage = MessageBuilder.createMessage(operationMessage, headerAccessor.getMessageHeaders());
+		Message<?> responseMessage = MessageBuilder.createMessage(operationMessage, getMessageHeaders());
 
 		outboundChannel.send(responseMessage);
     }
@@ -130,10 +131,17 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
 	    Map<String, Object> payload = Collections.singletonMap("data", data);
 	    GraphQLMessage operationData = new GraphQLMessage(operationMessageId, GraphQLMessageType.DATA, payload);
 
-		Message<?> responseMessage = MessageBuilder.createMessage(operationData, headerAccessor.getMessageHeaders());
+		Message<?> responseMessage = MessageBuilder.createMessage(operationData, getMessageHeaders());
 
 		// Send message directly to user
 	    outboundChannel.send(responseMessage);
+    }
+    
+    private MessageHeaders getMessageHeaders() {
+        MessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.getMutableAccessor(message);
+        headerAccessor.setLeaveMutable(true); // must be mutable to preserve publish order!
+        
+        return headerAccessor.getMessageHeaders();
     }
 
 }

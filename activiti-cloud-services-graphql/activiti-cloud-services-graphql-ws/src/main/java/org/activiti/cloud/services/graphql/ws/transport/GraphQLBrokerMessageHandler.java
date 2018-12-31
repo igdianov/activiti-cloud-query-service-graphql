@@ -73,6 +73,8 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
 
 		this.graphQLSubscriptionExecutor = graphQLSubscriptionExecutor;
 		this.graphQLsubscriptionRegistry = new GraphQLBrokerSubscriptionRegistry();
+		
+		setPreservePublishOrder(true);
 	}
 
     public GraphQLBrokerSubscriptionRegistry getGraphQLsubscriptionRegistry() {
@@ -256,30 +258,32 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
         }
         ExecutionResult executionResult = graphQLSubscriptionExecutor.execute(parameters.getQuery(),
                                                                               parameters.getVariables());
-
+        
         if (executionResult.getErrors().isEmpty()) {
-            Optional.ofNullable(executionResult.<Publisher<ExecutionResult>> getData())
-                    .map(data -> {
-                        GraphQLBrokerChannelSubscriber subscriber = new GraphQLBrokerChannelSubscriber(message,
-                                                                                                       operationPayload.getId(),
-                                                                                                       getClientOutboundChannel(),
-                                                                                                       bufferTimeSpanMs,
-                                                                                                       bufferCount);
-
-                        graphQLsubscriptionRegistry.subscribe(sessionId,
-                                                              operationPayload.getId(),
-                                                              subscriber,
-                                                              () -> {
-                                                                  data.subscribe(subscriber);
-                                                              });
-
-                        return data;
-                    })
-                    .orElseGet(() -> {
-                        sendErrorMessageToClient("Server error!", GraphQLMessageType.ERROR, message);
-
-                        return null;
-                    });
+            if (executionResult.getData() == null) {
+                sendErrorMessageToClient("Server error!", GraphQLMessageType.ERROR, message);
+            }
+            else if (executionResult.getData() instanceof Publisher) {
+                Optional.of(executionResult.<Publisher<ExecutionResult>> getData())
+                        .ifPresent(data -> {
+                            MessageChannel outboundChannel = getClientOutboundChannelForSession(sessionId);
+                            
+                            GraphQLBrokerChannelSubscriber subscriber = new GraphQLBrokerChannelSubscriber(message,
+                                                                                                           operationPayload.getId(),
+                                                                                                           outboundChannel,
+                                                                                                           bufferTimeSpanMs,
+                                                                                                           bufferCount);
+                            graphQLsubscriptionRegistry.subscribe(sessionId,
+                                                                  operationPayload.getId(),
+                                                                  subscriber,
+                                                                  () -> {
+                                                                      data.subscribe(subscriber);
+                                                                  });
+                        });
+            } else {
+                handleQueryOrMutation(operationPayload.getId(), executionResult, message);
+            }
+            
         } else {
             Map<String, Object> payload = Collections.singletonMap("errors", executionResult.getErrors());
 
@@ -289,6 +293,7 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
                                                                         payload);
 
             MessageHeaderAccessor messageHeaderAccessor = SimpMessageHeaderAccessor.getMutableAccessor(startSubscriptionMessage);
+
             Message<GraphQLMessage> errorMessage = MessageBuilder.createMessage(startSubscriptionErrors,
                                                                                 messageHeaderAccessor.getMessageHeaders());
 
@@ -296,6 +301,25 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
         }
 
     }
+    
+    private void handleQueryOrMutation(String id, ExecutionResult result, Message<GraphQLMessage> message) {
+            Map<String, Object> payload = Collections.singletonMap("data", result.getData());
+            MessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.getMutableAccessor(message);
+            
+            GraphQLMessage operationData = new GraphQLMessage(id, GraphQLMessageType.DATA, payload);
+
+            Message<?> dataMessage = MessageBuilder.createMessage(operationData, headerAccessor.getMessageHeaders());
+
+            // Send data
+            getClientOutboundChannel().send(dataMessage);
+            
+            GraphQLMessage completeData = new GraphQLMessage(id, GraphQLMessageType.COMPLETE, Collections.emptyMap());
+
+            Message<?> completeMessage = MessageBuilder.createMessage(completeData, headerAccessor.getMessageHeaders());
+            
+            // Send complete
+            getClientOutboundChannel().send(completeMessage);
+    }    
 
     @Timed
     protected final void handleStopSubscription(Message<GraphQLMessage> message) {

@@ -5,66 +5,44 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
-import org.springframework.context.SmartLifecycle;
+import org.springframework.cloud.stream.reactive.StreamEmitter;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
 @Component
 @EnableBinding(EngineEventsMessageProducer.ProducerChannels.class)
-public class EngineEventsMessageProducer implements SmartLifecycle {
+public class EngineEventsMessageProducer {
     
     public interface ProducerChannels {
-
         @Output("producer")
         MessageChannel engineEvents();
-        
     }    
     
-    private final ProducerChannels producerChannels;
-    
-    private Disposable control;
-    
-    public EngineEventsMessageProducer(ProducerChannels producerChannels) {
-        this.producerChannels = producerChannels;
-    }
-
-    @Override
-    public void start() {
-        List<Map<String, Object>> events;
-        try {
-            events = new ObjectMapper().readValue(json, new TypeReference<List<Map<String,Object>>>(){});
-        } catch (IOException cause) {
-            throw new RuntimeException(cause);
-        }
+    @StreamEmitter
+    @Output("producer")
+    public Flux<Message<List<Map<String, Object>>>> emit() throws JsonParseException, JsonMappingException, IOException {
+        List<Map<String, Object>> events = new ObjectMapper().readValue(json, new TypeReference<List<Map<String,Object>>>(){});
         
-        this.control = Flux.interval(Duration.ofMillis(0), Duration.ofMillis(10000), Schedulers.single())
-            .onBackpressureDrop()
-            .map(interval -> MessageBuilder.withPayload(events).setHeader("routingKey", String.valueOf(interval)).build())
-            .doOnNext(producerChannels.engineEvents()::send)
-            .doOnError(System.out::println)
-            .retry()
-            .subscribe();
+        return Flux.interval(Duration.ofMillis(0), Duration.ofMillis(1000), Schedulers.single())
+                   .onBackpressureDrop()
+                   .map(interval -> MessageBuilder.withPayload(events)
+                                                  .setHeader("routingKey", String.valueOf(interval))
+                                                  .build())
+                   .doOnError(System.out::println)
+                   .retry();
     }
 
-    @Override
-    public void stop() {
-        this.control.dispose();
-    }
-
-    @Override
-    public boolean isRunning() {
-        return this.control != null;
-    }
-        
-    private String json =
+    private static String json =
     "[  \r\n" + 
     "   {  \r\n" + 
     "      \"eventType\":\"PROCESS_CREATED\",\r\n" + 

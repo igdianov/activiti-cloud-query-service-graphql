@@ -65,7 +65,14 @@ public class StompRelayFluxSinkEmitterHandler extends StompSessionHandlerAdapter
 		log.info("Stomp session connected: {}", session.getSessionId());
 
 		for (String destination : destinations) {
-			Subscription subs = session.subscribe("/topic/" + destination, this);
+		    StompHeaders headers = new StompHeaders();
+	        headers.setDestination("/topic/" + destination);
+	        // Let's try setting up durable subscription
+//            headers.add("durable", "true");
+//            headers.add("auto-delete", "false");
+//            headers.setId("id");
+            
+			Subscription subs = session.subscribe(headers, this);
 			log.info("Created subscription {} for destination ['{}'] in Stomp session: {}", subs.getSubscriptionId(), destination, session.getSessionId());
 		}
 	}

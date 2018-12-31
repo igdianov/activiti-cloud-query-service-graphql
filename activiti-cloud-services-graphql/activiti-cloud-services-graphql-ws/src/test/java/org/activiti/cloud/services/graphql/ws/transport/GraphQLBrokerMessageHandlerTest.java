@@ -49,12 +49,12 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.reactivestreams.Publisher;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ExecutorSubscribableChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketSession;
@@ -74,7 +74,7 @@ public class GraphQLBrokerMessageHandlerTest {
     private SubscribableChannel clientInboundChannel;
 
     @Mock
-    private MessageChannel clientOutboundChannel;
+    private ExecutorSubscribableChannel clientOutboundChannel;
 
     @Mock
     private SubscribableChannel brokerChannel;

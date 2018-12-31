@@ -30,5 +30,4 @@ public interface NotificationsGateway {
         headers={@GatewayHeader(name="content-type", value="application/json")}
     )
     public void send(@Payload EngineEvent notification, @Header("routingKey") String routingKey);
-
 }

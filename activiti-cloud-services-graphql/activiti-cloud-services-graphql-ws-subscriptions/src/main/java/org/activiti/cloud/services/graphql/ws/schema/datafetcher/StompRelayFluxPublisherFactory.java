@@ -27,8 +27,8 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.ReactorNettyTcpStompClient;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
+import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.UnicastProcessor;
 
 public class StompRelayFluxPublisherFactory implements EngineEventsPublisherFactory {
 
@@ -49,7 +49,7 @@ public class StompRelayFluxPublisherFactory implements EngineEventsPublisherFact
     public Publisher<EngineEvent> getPublisher(DataFetchingEnvironment environment) {
         
         
-        Flux<Message<EngineEvent>> stompRelayObservable = UnicastProcessor.create(emitter -> {
+        Flux<Message<EngineEvent>> stompRelayObservable = EmitterProcessor.create(emitter -> {
 
             List<String> destinations = destinationResolver.resolveDestinations(environment);
 
