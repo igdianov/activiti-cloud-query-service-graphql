@@ -18,6 +18,10 @@ package org.activiti.cloud.services.graphql.web;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,20 +38,33 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.reactive.socket.WebSocketHandler;
+import org.springframework.web.reactive.socket.WebSocketMessage;
+import org.springframework.web.reactive.socket.WebSocketSession;
+import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
+import org.springframework.web.reactive.socket.client.StandardWebSocketClient;
+import org.springframework.web.reactive.socket.client.WebSocketClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.ReplayProcessor;
+import reactor.test.StepVerifier;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@TestPropertySource({"classpath:hibernate.properties"})
 public class ActivitiGraphQLControllerIT {
 
     private static final String TASK_NAME = "task1";
     private static final String GRPAPHQL_URL = "/graphql";
-
+    private static final Duration TIMEOUT = Duration.ofMillis(10000);
+    
+    @LocalServerPort
+    private String port;
+    
     @Autowired
     private TestRestTemplate rest;
 
@@ -56,6 +73,65 @@ public class ActivitiGraphQLControllerIT {
         // Nothing
     }
 
+    @Test
+    public void echo() throws Exception {
+        int count = 1;
+        Flux<String> input = Flux.range(1, count).map(index -> "msg-" + index);
+        ReplayProcessor<Object> output = ReplayProcessor.create(count);
+
+        WebSocketClient client = new StandardWebSocketClient();
+        client.execute(getUrl("/ws/graphql"),
+                       new WebSocketHandler() {
+                            @Override
+                            public List<String> getSubProtocols() {
+                                return Collections.singletonList("graphql-ws");
+                            }
+                            @Override
+                            public Mono<Void> handle(WebSocketSession session) {
+                                return session
+                                        .send(input.map(session::textMessage))
+                                        .thenMany(session.receive().take(count).map(WebSocketMessage::getPayloadAsText))
+                                        .subscribeWith(output)
+                                        .then();
+                            }
+                        })                       
+                        .block(Duration.ofMillis(5000));
+
+        assertThat(input.collectList().block(Duration.ofMillis(5000))).isEqualTo(output.collectList().block(Duration.ofMillis(5000)));
+    }
+
+    protected URI getUrl(String path) throws URISyntaxException {
+        return new URI("ws://localhost:" + this.port + path);
+    }    
+    
+
+    @Test
+    public void testWebSockets() throws URISyntaxException {
+        WebSocketClient client = new ReactorNettyWebSocketClient();
+        ReplayProcessor<String> output = ReplayProcessor.create();
+
+        String initMessage = "{\"type\":\"connection_init\",\"payload\":{}}";
+
+        client.execute(getUrl("/ws/graphql"),
+                       session -> session.send(Mono.just(session.textMessage(initMessage)))
+                                         .thenMany(session.receive()
+                                                          .take(2)
+                                                          .map(WebSocketMessage::getPayloadAsText)
+                                                          .log())
+                                         .subscribeWith(output)
+                                         .then())
+              .subscribe();
+        
+        String ackMessage = "{\"payload\":{},\"id\":null,\"type\":\"connection_ack\",\"headers\":{}}";
+        String kaMessage = "{\"payload\":{},\"id\":null,\"type\":\"ka\",\"headers\":{}}";
+    
+        StepVerifier.create(output)
+                    .expectNext(ackMessage)
+                    .expectNext(kaMessage)
+                    .expectComplete()
+                    .verify(TIMEOUT);
+    }
+    
     @Test
     public void testGraphql() {
         GraphQLQueryRequest query = new GraphQLQueryRequest("{Tasks(where:{name:{EQ: \"" + TASK_NAME + "\"}}){select{id assignee priority}}}");

@@ -108,6 +108,7 @@ public class GraphQLWebSocketMessageBrokerAutoConfiguration {
             SubProtocolWebSocketHandler handler = new SubProtocolWebSocketHandler(clientInboundChannel(),
                                                                                   clientOutboundChannel());
             handler.addProtocolHandler(graphQLBrokerSubProtocolHandler());
+            handler.setDefaultProtocolHandler(graphQLBrokerSubProtocolHandler());
 
             return handler;
         }
