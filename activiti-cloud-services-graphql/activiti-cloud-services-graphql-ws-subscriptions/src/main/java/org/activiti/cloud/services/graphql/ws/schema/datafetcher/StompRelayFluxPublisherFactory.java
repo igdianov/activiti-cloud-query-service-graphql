@@ -15,6 +15,7 @@
  */
 package org.activiti.cloud.services.graphql.ws.schema.datafetcher;
 
+import java.time.Duration;
 import java.util.List;
 
 import graphql.schema.DataFetchingEnvironment;
@@ -22,6 +23,7 @@ import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.ReactorNettyTcpStompClient;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
@@ -47,7 +49,7 @@ public class StompRelayFluxPublisherFactory implements EngineEventsPublisherFact
     public Publisher<EngineEvent> getPublisher(DataFetchingEnvironment environment) {
         
         
-        Flux<EngineEvent> stompRelayObservable = UnicastProcessor.create(emitter -> {
+        Flux<Message<EngineEvent>> stompRelayObservable = UnicastProcessor.create(emitter -> {
 
             List<String> destinations = destinationResolver.resolveDestinations(environment);
 
@@ -60,7 +62,10 @@ public class StompRelayFluxPublisherFactory implements EngineEventsPublisherFact
             stompClient.connect(stompHeaders, handler);
         });
 
-        return stompRelayObservable.share();
+        return stompRelayObservable.map(Message::getPayload)
+                                   .share()
+                                   .doOnError(error -> log.error("Error connecting to stomp broker.", error))
+                                   .retryBackoff(Integer.MAX_VALUE, Duration.ofSeconds(1));
     }
 
 

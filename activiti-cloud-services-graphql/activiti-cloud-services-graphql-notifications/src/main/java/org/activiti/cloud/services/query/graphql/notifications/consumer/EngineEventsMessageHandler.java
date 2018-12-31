@@ -26,6 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
 public class EngineEventsMessageHandler {
@@ -33,11 +35,11 @@ public class EngineEventsMessageHandler {
     private static Logger logger = LoggerFactory.getLogger(EngineEventsMessageHandler.class);
     private static ObjectMapper objectMapper = new ObjectMapper();
 
-    private final FluxSink<EngineEvent> engineEventsSink;
+    private final FluxSink<Message<EngineEvent>> engineEventsSink;
     private final EngineEventsTransformer transformer;
     
     public EngineEventsMessageHandler(EngineEventsTransformer transformer,
-                                      FluxSink<EngineEvent> engineEventsSink)
+                                      FluxSink<Message<EngineEvent>> engineEventsSink)
     {
         this.engineEventsSink = engineEventsSink;
         this.transformer = transformer;
@@ -50,11 +52,11 @@ public class EngineEventsMessageHandler {
 
         logger.info("Recieved source message with routingKey: {}", sourceRoutingKey);
         
-        transformer.transform(events)
-            .forEach(engineEventsSink::next);
+        Flux.fromIterable(transformer.transform(events))
+            .map(engineEvent -> MessageBuilder.createMessage(engineEvent, source.getHeaders()))
+            .doOnNext(engineEventsSink::next)
+            .doOnError(error -> logger.error("Error handling message with routingKey: " + sourceRoutingKey, error))
+            .retry()
+            .subscribe();
     }
-
-
-
-
 }

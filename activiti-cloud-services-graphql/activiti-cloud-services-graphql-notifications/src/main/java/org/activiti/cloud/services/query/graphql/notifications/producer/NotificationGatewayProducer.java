@@ -7,10 +7,11 @@ import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.Message;
 import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.SignalType;
 
-public class NotificationGatewayProducer extends BaseSubscriber<EngineEvent>{
+public class NotificationGatewayProducer extends BaseSubscriber<Message<EngineEvent>>{
 
     private static Logger log = LoggerFactory.getLogger(NotificationGatewayProducer.class);
 
@@ -24,14 +25,20 @@ public class NotificationGatewayProducer extends BaseSubscriber<EngineEvent>{
         this.notificationsGateway = notificationsGateway;
         this.routingKeyResolver = routingKeyResolver;
     }
-
-    @Override
-    protected void hookOnNext(EngineEvent notification) {
-        String routingKey = routingKeyResolver.resolveRoutingKey(notification);
+    
+    public void send(EngineEvent event) {
+        String routingKey = routingKeyResolver.resolveRoutingKey(event);
 
         log.info("Routing notification to: {}", routingKey);
         
-        notificationsGateway.send(notification, routingKey);
+        notificationsGateway.send(event, routingKey);
+    }
+
+    @Override
+    protected void hookOnNext(Message<EngineEvent> message) {
+        EngineEvent payload = message.getPayload();
+        
+        send(payload);
     }
 
     @Override

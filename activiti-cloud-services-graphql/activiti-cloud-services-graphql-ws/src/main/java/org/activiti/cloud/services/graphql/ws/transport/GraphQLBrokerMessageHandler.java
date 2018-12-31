@@ -133,7 +133,7 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
 					(getHeartbeatValue()[0] == 0 && getHeartbeatValue()[1] == 0),
 					"Heartbeat values configured but no TaskScheduler provided");
 		}
-
+		publishBrokerAvailableEvent();
 	}
 
 	@Override

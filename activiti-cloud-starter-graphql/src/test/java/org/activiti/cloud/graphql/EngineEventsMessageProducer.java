@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
@@ -47,12 +45,13 @@ public class EngineEventsMessageProducer implements SmartLifecycle {
             throw new RuntimeException(cause);
         }
         
-        Consumer<Message<List<Map<String, Object>>>> consumer = (message) -> producerChannels.engineEvents()
-                                                                                             .send(message);
-        this.control = Flux.interval(Duration.ofMillis(0), Duration.ofMillis(100), Schedulers.single())
+        this.control = Flux.interval(Duration.ofMillis(0), Duration.ofMillis(10000), Schedulers.single())
             .onBackpressureDrop()
-            .map(it -> MessageBuilder.withPayload(events).build()) 
-            .subscribe(consumer);
+            .map(interval -> MessageBuilder.withPayload(events).setHeader("routingKey", String.valueOf(interval)).build())
+            .doOnNext(producerChannels.engineEvents()::send)
+            .doOnError(System.out::println)
+            .retry()
+            .subscribe();
     }
 
     @Override

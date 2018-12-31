@@ -23,6 +23,7 @@ import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.Message;
 import org.springframework.util.AntPathMatcher;
 import reactor.core.publisher.Flux;
 
@@ -32,11 +33,11 @@ public class EngineEventsFluxPublisherFactory implements EngineEventsPublisherFa
 
     private DataFetcherDestinationResolver destinationResolver = new AntPathDestinationResolver();
 
-    private final Flux<EngineEvent> engineEventsFlux;
+    private final Flux<Message<EngineEvent>> engineEventsFlux;
     private final AntPathMatcher pathMatcher = new AntPathMatcher(".");
     private final RoutingKeyResolver routingKeyResolver ;
     
-    public EngineEventsFluxPublisherFactory(Flux<EngineEvent> engineEventsFlux,
+    public EngineEventsFluxPublisherFactory(Flux<Message<EngineEvent>> engineEventsFlux,
                                             RoutingKeyResolver routingKeyResolver) {
         this.engineEventsFlux = engineEventsFlux;
         this.routingKeyResolver = routingKeyResolver;
@@ -44,16 +45,17 @@ public class EngineEventsFluxPublisherFactory implements EngineEventsPublisherFa
     
     @Override
     public Publisher<EngineEvent> getPublisher(DataFetchingEnvironment environment) {
-        
-        List<String> destinations = destinationResolver.resolveDestinations(environment);
 
-        return engineEventsFlux.filter(engineEvent -> {
-            String path = routingKeyResolver.resolveRoutingKey(engineEvent);
-            
-            return destinations.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
-        });
+        return engineEventsFlux.map(Message::getPayload)
+                               .filter(engineEvent -> {
+                                   List<String> destinations = destinationResolver.resolveDestinations(environment);
+                                   String path = routingKeyResolver.resolveRoutingKey(engineEvent);
+
+                                   return destinations.stream()
+                                                      .anyMatch(pattern -> pathMatcher.match(pattern, path));
+                               });
     }
-
+    
     /**
      * @param destinationResolver
      */

@@ -225,8 +225,8 @@ public class GraphQLBrokerMessageHandlerTest {
 
         assertThat(completeLatch.await(2000, TimeUnit.MILLISECONDS)).isTrue();
         
-        // then
-        verify(this.clientOutboundChannel, atLeast(100)).send(this.messageCaptor.capture());
+        // then get last message
+        verify(this.clientOutboundChannel, atLeast(99)).send(this.messageCaptor.capture());
 
         GraphQLMessage completeMessage = messageCaptor.getValue().getPayload();
 

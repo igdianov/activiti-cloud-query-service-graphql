@@ -80,6 +80,7 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
     public void onSubscribe(Subscription s) {
         log.info("New subscription: {}", s);
         subscriptionRef.set(s);
+        
         requestNext(1);
     }
 

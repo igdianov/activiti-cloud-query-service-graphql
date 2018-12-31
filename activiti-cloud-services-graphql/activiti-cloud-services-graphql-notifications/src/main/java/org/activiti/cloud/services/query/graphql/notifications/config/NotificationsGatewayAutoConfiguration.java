@@ -15,18 +15,16 @@
  */
 package org.activiti.cloud.services.query.graphql.notifications.config;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.activiti.cloud.services.query.graphql.notifications.NotificationsGateway;
-import org.activiti.cloud.services.query.graphql.notifications.RoutingKeyResolver;
 import org.activiti.cloud.services.query.graphql.notifications.consumer.DefaultEngineEventsTransformer;
 import org.activiti.cloud.services.query.graphql.notifications.consumer.EngineEventsMessageHandler;
 import org.activiti.cloud.services.query.graphql.notifications.consumer.EngineEventsTransformer;
 import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
-import org.activiti.cloud.services.query.graphql.notifications.producer.NotificationGatewayProducer;
-import org.activiti.cloud.services.query.graphql.notifications.producer.SpELTemplateRoutingKeyResolver;
 import org.reactivestreams.Subscriber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -38,9 +36,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.integration.annotation.IntegrationComponentScan;
+import org.springframework.messaging.Message;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.WorkQueueProcessor;
+import reactor.core.publisher.TopicProcessor;
 
 /**
  * Notification Gateway configuration that enables messaging channel bindings
@@ -53,100 +52,74 @@ import reactor.core.publisher.WorkQueueProcessor;
 @EnableConfigurationProperties(NotificationsConsumerProperties.class)
 @ConditionalOnProperty(name="spring.activiti.cloud.services.graphql.notifications.enabled", matchIfMissing = true)
 @PropertySource("classpath:META-INF/graphql-notifications.properties")
-public class NotificationsGatewayAutoConfiguration {
+public class NotificationsGatewayAutoConfiguration implements SmartLifecycle  {
 
     private final NotificationsConsumerProperties properties;
+    private final List<Subscriber<Message<EngineEvent>>> subscribers = new ArrayList<>();
+    boolean running;
+    
+    private TopicProcessor<Message<EngineEvent>> engineEventsProcessor = TopicProcessor.<Message<EngineEvent>> builder()
+                                                                                      .name("engineEventsProcessor")
+                                                                                      .autoCancel(false)
+                                                                                      .share(true)
+                                                                                      .bufferSize(1024)
+                                                                                      .build();    
 
     @Autowired
     public NotificationsGatewayAutoConfiguration(NotificationsConsumerProperties properties) {
         this.properties = properties;
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public RoutingKeyResolver routingKeyResolver() {
-        return new SpELTemplateRoutingKeyResolver();
+    @Autowired(required=false)
+    public void setSubscribers(List<Subscriber<Message<EngineEvent>>> subscribers) {
+        this.subscribers.addAll(subscribers);
     }
-
+    
     @Bean
     @ConditionalOnMissingBean
     public EngineEventsTransformer engineEventsTransformer() {
         return new DefaultEngineEventsTransformer(
             Arrays.asList(properties.getProcessEngineEventAttributeKeys().split(",")),
             properties.getProcessEngineEventTypeKey()
-        );
+        ); 
     }
-    
-    @Bean
-    @ConditionalOnMissingBean
-    public Subscriber<EngineEvent> notificationGatewayProducer(NotificationsGateway notificationsGateway,
-                                                               RoutingKeyResolver routingKeyResolver) {
-        return new NotificationGatewayProducer(notificationsGateway,
-                                               routingKeyResolver);
-    }    
-
+        
     @Bean
     @ConditionalOnMissingBean
     public EngineEventsMessageHandler engineEventsMessageHandler(EngineEventsTransformer engineEventsTransformer,
-                                                                 FluxSink<EngineEvent> engineEventsSink)    {
+                                                                 FluxSink<Message<EngineEvent>> engineEventsSink)    {
         return new EngineEventsMessageHandler(engineEventsTransformer, engineEventsSink);
     }
 
-    private WorkQueueProcessor<EngineEvent> engineEventsProcessor = WorkQueueProcessor.<EngineEvent>builder()
-                                                                                      .name("engineEventsProcessor")
-                                                                                      .autoCancel(false)
-                                                                                      .share(true)
-                                                                                      .bufferSize(1024)
-                                                                                      .build();
-    
-//    private EmitterProcessor<EngineEvent> engineEventsProcessor = EmitterProcessor.create(1024, false);
-
-    
     @Bean
     @ConditionalOnMissingBean
-    public Flux<EngineEvent> engineEventsFlux() {
+    public Flux<Message<EngineEvent>> engineEventsFlux() {
         return engineEventsProcessor.share();
     }
     
     @Bean
     @ConditionalOnMissingBean
-    public FluxSink<EngineEvent> engineEventsSink() {
+    public FluxSink<Message<EngineEvent>> engineEventsSink() {
         return engineEventsProcessor.sink();
     }
     
-    @Configuration
-    static class EngineEventsFluxSubscribersConfigurer implements SmartLifecycle {
+    @Override
+    public void start() {
+        subscribers.forEach(s -> engineEventsProcessor.subscribe(s));
+        running = true;
+    }
 
-        private final Flux<EngineEvent> connectableEngineEventsFlux;
-        
-        private List<Subscriber<EngineEvent>> subscribers = new ArrayList<>();
-        
-        boolean running;
-
-        @Autowired
-        public EngineEventsFluxSubscribersConfigurer(Flux<EngineEvent> engineEventsFlux) {
-            this.connectableEngineEventsFlux = Flux.from(engineEventsFlux);
-        }
-        
-        @Autowired(required=false)
-        public void setSubscribers(List<Subscriber<EngineEvent>> subscribers) {
-            this.subscribers.addAll(subscribers);
-        }
-        
-        @Override
-        public void start() {
-            subscribers.forEach(s -> connectableEngineEventsFlux.subscribe(s));
-            running = true;
-        }
-
-        @Override
-        public void stop() {
+    @Override
+    public void stop() {
+        try {
+            engineEventsProcessor.awaitAndShutdown(Duration.ofSeconds(1));
+        } finally {
             running = false;
         }
+    }
 
-        @Override
-        public boolean isRunning() {
-            return running;
-        }
+    @Override
+    public boolean isRunning() {
+        return running;
     }
 }

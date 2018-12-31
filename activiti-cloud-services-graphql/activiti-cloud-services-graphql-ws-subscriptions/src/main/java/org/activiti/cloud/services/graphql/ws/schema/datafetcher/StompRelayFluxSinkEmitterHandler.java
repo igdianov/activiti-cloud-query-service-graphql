@@ -16,16 +16,20 @@
 package org.activiti.cloud.services.graphql.ws.schema.datafetcher;
 
 import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSession.Subscription;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.messaging.support.MessageBuilder;
 import reactor.core.Disposable;
 import reactor.core.publisher.FluxSink;
 
@@ -34,7 +38,7 @@ public class StompRelayFluxSinkEmitterHandler extends StompSessionHandlerAdapter
     private static Logger log = LoggerFactory.getLogger(StompRelayFluxSinkEmitterHandler.class);
 
 	private final List<String> destinations;
-	private final FluxSink<EngineEvent> emitter;
+	private final FluxSink<Message<EngineEvent>> emitter;
 
 	private StompSession session;
 
@@ -42,7 +46,7 @@ public class StompRelayFluxSinkEmitterHandler extends StompSessionHandlerAdapter
 	 * @param destinations
 	 * @param emitter
 	 */
-	public StompRelayFluxSinkEmitterHandler(List<String> destinations, FluxSink<EngineEvent> emitter) {
+	public StompRelayFluxSinkEmitterHandler(List<String> destinations, FluxSink<Message<EngineEvent>> emitter) {
 		this.destinations = destinations;
 		this.emitter = emitter;
 
@@ -66,11 +70,22 @@ public class StompRelayFluxSinkEmitterHandler extends StompSessionHandlerAdapter
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void handleFrame(StompHeaders headers, Object payload) {
-		emitter.next((EngineEvent) payload);
+	    
+        Message<EngineEvent> message = MessageBuilder.withPayload(EngineEvent.class.cast(payload))
+                                                     .copyHeaders(toSingleValueMap(headers))
+                                                     .build();
+	    
+		emitter.next(message);
 	}
+	
+    private Map<String, Object> toSingleValueMap(StompHeaders headers) {
+        LinkedHashMap<String, Object> singleValueMap = new LinkedHashMap<>(headers.size());
+        headers.forEach((key, value) -> singleValueMap.put(key, value.get(0)));
+        return singleValueMap;
+    }
+	
 
 	@Override
 	public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload,
