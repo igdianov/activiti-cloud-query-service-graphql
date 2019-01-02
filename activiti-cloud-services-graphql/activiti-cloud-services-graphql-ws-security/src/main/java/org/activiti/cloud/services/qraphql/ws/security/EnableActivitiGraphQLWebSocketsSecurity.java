@@ -22,14 +22,14 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.activiti.cloud.services.qraphql.ws.security.GraphQLSecurityWebSocketMessageBrokerAutoConfiguration.DefaultGraphQLSecurityWebSocketMessageBrokerConfiguration;
+import org.activiti.cloud.services.qraphql.ws.security.WebSocketMessageBrokerSecurityAutoConfiguration.DefaultWebSocketMessageBrokerSecurityConfiguration;
 import org.springframework.context.annotation.Import;
 
 
 @Documented
 @Retention(RUNTIME)
 @Target(TYPE)
-@Import(DefaultGraphQLSecurityWebSocketMessageBrokerConfiguration.class)
+@Import(DefaultWebSocketMessageBrokerSecurityConfiguration.class)
 public @interface EnableActivitiGraphQLWebSocketsSecurity {
 
 }

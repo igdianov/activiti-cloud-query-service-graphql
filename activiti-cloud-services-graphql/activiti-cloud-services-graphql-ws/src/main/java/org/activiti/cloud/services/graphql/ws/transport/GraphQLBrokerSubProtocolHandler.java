@@ -20,6 +20,7 @@ import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -51,6 +52,10 @@ import org.springframework.web.socket.handler.SessionLimitExceededException;
 import org.springframework.web.socket.messaging.SubProtocolHandler;
 
 public class GraphQLBrokerSubProtocolHandler implements SubProtocolHandler, ApplicationEventPublisherAware {
+
+    private static final String X_AUTHORIZATION = "X-Authorization";
+
+    private static final String GRAPHQL_MESSAGE_TYPE = "graphQLMessageType";
 
     public static final String GRAPHQL_WS = "graphql-ws";
 
@@ -97,7 +102,6 @@ public class GraphQLBrokerSubProtocolHandler implements SubProtocolHandler, Appl
 					.readValue(textMessage.getPayload());
 
 			try {
-
 				SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
 
 				headerAccessor.setDestination(destination);
@@ -107,8 +111,7 @@ public class GraphQLBrokerSubProtocolHandler implements SubProtocolHandler, Appl
 				headerAccessor.setLeaveMutable(true);
 				Message<GraphQLMessage> decodedMessage = MessageBuilder.createMessage(payload, headerAccessor.getMessageHeaders());
 
-				// TODO inject client KA interval
-				headerAccessor.setHeader(StompHeaderAccessor.HEART_BEAT_HEADER, new long[] {0, 5000});
+                headerAccessor.setHeader(GRAPHQL_MESSAGE_TYPE, payload.getType().toString());
 
 				if (logger.isTraceEnabled()) {
 					logger.trace("From client: " + headerAccessor.getShortLogMessage(message.getPayload()));
@@ -117,6 +120,17 @@ public class GraphQLBrokerSubProtocolHandler implements SubProtocolHandler, Appl
 				boolean isConnect = GraphQLMessageType.CONNECTION_INIT.equals(payload.getType());
 				if (isConnect) {
 					this.stats.incrementConnectCount();
+					
+					if( payload.payload != null) {
+                        // inject bearer token
+    	                headerAccessor.setHeader(X_AUTHORIZATION, payload.payload.get(X_AUTHORIZATION));
+    
+    	                // inject client KA interval
+    	                Integer kaInterval = Optional.ofNullable((Integer)payload.payload.get(StompHeaderAccessor.HEART_BEAT_HEADER))
+    	                                             .orElse(5000);
+    	                
+    	                headerAccessor.setHeader(StompHeaderAccessor.HEART_BEAT_HEADER, new long[] {0, kaInterval});
+					}
 				}
 				else if (GraphQLMessageType.CONNECTION_TERMINATE.equals(payload.getType())) {
 					this.stats.incrementDisconnectCount();

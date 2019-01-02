@@ -27,7 +27,14 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-websocket</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.activiti.cloud.common</groupId>
+      <artifactId>activiti-cloud-services-common-security-keycloak</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.common</groupId>
+      <artifactId>activiti-cloud-services-common-identity-keycloak</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>

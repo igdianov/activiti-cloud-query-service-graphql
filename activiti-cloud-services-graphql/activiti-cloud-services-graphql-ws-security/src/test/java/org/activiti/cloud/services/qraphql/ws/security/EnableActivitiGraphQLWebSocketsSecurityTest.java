@@ -2,8 +2,6 @@ package org.activiti.cloud.services.qraphql.ws.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.activiti.cloud.services.qraphql.ws.security.EnableActivitiGraphQLWebSocketsSecurity;
-import org.activiti.cloud.services.qraphql.ws.security.GraphQLSecurityWebSocketMessageBrokerConfigurer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class EnableActivitiGraphQLWebSocketsSecurityTest {
 
     @Autowired
-    private GraphQLSecurityWebSocketMessageBrokerConfigurer configuration;
+    private WebSocketMessageBrokerSecurityConfigurer configuration;
 
     @EnableAutoConfiguration
     @SpringBootConfiguration
@@ -30,7 +28,7 @@ public class EnableActivitiGraphQLWebSocketsSecurityTest {
     @Test
     public void testContextLoads() {
         assertThat(configuration.getEndpoint()).isEqualTo("/ws/graphql");
-        assertThat(configuration.getAuthorities()).isEqualTo(new String[]{"graphql-ws"});
+        assertThat(configuration.getAuthorities()).isEqualTo(new String[]{"ACTIVITI_ADMIN"});
         assertThat(configuration.sameOriginDisabled()).isTrue();
     }
 

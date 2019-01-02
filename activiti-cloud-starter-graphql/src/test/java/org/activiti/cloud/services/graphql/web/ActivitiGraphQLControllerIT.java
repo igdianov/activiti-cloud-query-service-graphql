@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +30,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import graphql.ExecutionResult;
 import graphql.GraphQLError;
 import org.activiti.cloud.services.graphql.web.ActivitiGraphQLController.GraphQLQueryRequest;
+import org.activiti.cloud.services.test.identity.keycloak.interceptor.KeycloakTokenProducer;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,25 +40,26 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.reactive.socket.WebSocketHandler;
-import org.springframework.web.reactive.socket.WebSocketMessage;
-import org.springframework.web.reactive.socket.WebSocketSession;
-import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
-import org.springframework.web.reactive.socket.client.StandardWebSocketClient;
-import org.springframework.web.reactive.socket.client.WebSocketClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.ReplayProcessor;
+import reactor.netty.NettyPipeline;
+import reactor.netty.http.client.HttpClient;
 import reactor.test.StepVerifier;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ActivitiGraphQLControllerIT {
 
+    private static final String GRAPHQL_WS = "graphql-ws";
+    private static final String HRUSER = "hruser";
+    private static final String AUTHORIZATION = "Authorization";
+    private static final String TESTADMIN = "testadmin";
     private static final String TASK_NAME = "task1";
     private static final String GRPAPHQL_URL = "/graphql";
     private static final Duration TIMEOUT = Duration.ofMillis(10000);
@@ -66,61 +68,63 @@ public class ActivitiGraphQLControllerIT {
     private String port;
     
     @Autowired
+    private KeycloakTokenProducer keycloakTokenProducer;
+    
+    @Autowired
     private TestRestTemplate rest;
 
+    private HttpHeaders authHeaders;
+    
     @SpringBootApplication
+    @ComponentScan({"org.activiti.cloud.starters.test",
+                    "org.activiti.cloud.services.test.identity.keycloak.interceptor"})
     static class Application {
         // Nothing
     }
 
-    @Test
-    public void echo() throws Exception {
-        int count = 1;
-        Flux<String> input = Flux.range(1, count).map(index -> "msg-" + index);
-        ReplayProcessor<Object> output = ReplayProcessor.create(count);
-
-        WebSocketClient client = new StandardWebSocketClient();
-        client.execute(getUrl("/ws/graphql"),
-                       new WebSocketHandler() {
-                            @Override
-                            public List<String> getSubProtocols() {
-                                return Collections.singletonList("graphql-ws");
-                            }
-                            @Override
-                            public Mono<Void> handle(WebSocketSession session) {
-                                return session
-                                        .send(input.map(session::textMessage))
-                                        .thenMany(session.receive().take(count).map(WebSocketMessage::getPayloadAsText))
-                                        .subscribeWith(output)
-                                        .then();
-                            }
-                        })                       
-                        .block(Duration.ofMillis(5000));
-
-        assertThat(input.collectList().block(Duration.ofMillis(5000))).isEqualTo(output.collectList().block(Duration.ofMillis(5000)));
+    
+    /**
+     * 
+     */
+    @Before
+    public void setUp() {
+        keycloakTokenProducer.setKeycloakTestUser(TESTADMIN);
+        authHeaders = keycloakTokenProducer.authorizationHeaders();
     }
-
+    
     protected URI getUrl(String path) throws URISyntaxException {
         return new URI("ws://localhost:" + this.port + path);
     }    
     
-
     @Test
-    public void testWebSockets() throws URISyntaxException {
-        WebSocketClient client = new ReactorNettyWebSocketClient();
+    public void testGraphqlWsSubprotocolServerSupported() {
         ReplayProcessor<String> output = ReplayProcessor.create();
-
-        String initMessage = "{\"type\":\"connection_init\",\"payload\":{}}";
-
-        client.execute(getUrl("/ws/graphql"),
-                       session -> session.send(Mono.just(session.textMessage(initMessage)))
-                                         .thenMany(session.receive()
-                                                          .take(2)
-                                                          .map(WebSocketMessage::getPayloadAsText)
-                                                          .log())
-                                         .subscribeWith(output)
-                                         .then())
-              .subscribe();
+        
+        keycloakTokenProducer.setKeycloakTestUser(TESTADMIN);
+        final String auth = keycloakTokenProducer.authorizationHeaders().getFirst(AUTHORIZATION);
+        
+        String initMessage = "{\"type\":\"connection_init\",\"payload\":{\"simpHeartbeat\":1000}}";
+        
+        HttpClient.create()
+                  .baseUrl("ws://localhost:"+port)
+                  .wiretap(true)
+                  .headers(h -> h.add(AUTHORIZATION, auth))
+                  .websocket(GRAPHQL_WS)
+                  .uri("/ws/graphql")
+                  .handle((i, o) -> {
+                      o.options(NettyPipeline.SendOptions::flushOnEach)
+                       .sendString(Mono.just(initMessage))
+                       .then()
+                       .log()
+                       .subscribe();
+                      
+                      return i.receive().asString();
+                  })
+                  .log("client-received")
+                  .take(2)
+                  .subscribeWith(output)
+                  .collectList()
+                  .subscribe();
         
         String ackMessage = "{\"payload\":{},\"id\":null,\"type\":\"connection_ack\",\"headers\":{}}";
         String kaMessage = "{\"payload\":{},\"id\":null,\"type\":\"ka\",\"headers\":{}}";
@@ -133,10 +137,50 @@ public class ActivitiGraphQLControllerIT {
     }
     
     @Test
+    public void testGraphqlWsSubprotocolServerUnauthorized() {
+        ReplayProcessor<String> output = ReplayProcessor.create();
+
+        keycloakTokenProducer.setKeycloakTestUser(HRUSER);
+        
+        final String auth =  keycloakTokenProducer.authorizationHeaders().getFirst(AUTHORIZATION);
+        
+        String initMessage = "{\"type\":\"connection_init\",\"payload\":{}}";
+        
+        
+        HttpClient.create()
+                  .baseUrl("ws://localhost:"+port)
+                  .wiretap(true)
+                  .headers(h -> h.add(AUTHORIZATION, auth))
+                  .websocket(GRAPHQL_WS)
+                  .uri("/ws/graphql")
+                  .handle((i, o) -> {
+                      o.options(NettyPipeline.SendOptions::flushOnEach)
+                       .sendString(Mono.just(initMessage))
+                       .then()
+                       .log()
+                       .subscribe();
+                      
+                      return i.receive().asString();
+                  })
+                  .log("client-received")
+                  .take(2)
+                  .subscribeWith(output)
+                  .collectList()
+                  .doOnError(i -> System.err.println("Failed requesting server: " + i))
+                  .subscribe();
+        
+        StepVerifier.create(output)
+                    .expectError()
+                    .verifyThenAssertThat(TIMEOUT)
+                    .hasOperatorErrorWithMessageContaining("Invalid handshake response getStatus: 403")
+                    ;
+    }    
+    
+    @Test
     public void testGraphql() {
         GraphQLQueryRequest query = new GraphQLQueryRequest("{Tasks(where:{name:{EQ: \"" + TASK_NAME + "\"}}){select{id assignee priority}}}");
-
-        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
+        
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query,authHeaders), Result.class);
 
         assertThat(HttpStatus.OK)
             .describedAs(entity.toString())
@@ -154,6 +198,21 @@ public class ActivitiGraphQLControllerIT {
 
     }
 
+    @Test
+    public void testGraphqlUnauthorized() {
+        GraphQLQueryRequest query = new GraphQLQueryRequest("{Tasks(where:{name:{EQ: \"" + TASK_NAME + "\"}}){select{id assignee priority}}}");
+        
+        keycloakTokenProducer.setKeycloakTestUser(HRUSER);
+        authHeaders = keycloakTokenProducer.authorizationHeaders();
+        
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query,authHeaders), Result.class);
+
+        assertThat(HttpStatus.FORBIDDEN)
+            .describedAs(entity.toString())
+            .isEqualTo(entity.getStatusCode());
+
+    }
+    
     @Test
     public void testGraphqlWhere() {
         // @formatter:off
@@ -177,7 +236,7 @@ public class ActivitiGraphQLControllerIT {
         	    "	}");
        // @formatter:on
 
-        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query, authHeaders), Result.class);
 
         assertThat(HttpStatus.OK)
             .describedAs(entity.toString())
@@ -225,7 +284,7 @@ public class ActivitiGraphQLControllerIT {
                 + "}");
        // @formatter:on
 
-        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query, authHeaders), Result.class);
 
         assertThat(HttpStatus.OK)
             .describedAs(entity.toString())
@@ -259,7 +318,7 @@ public class ActivitiGraphQLControllerIT {
         		);
        // @formatter:on
 
-        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query, authHeaders), Result.class);
 
         assertThat(HttpStatus.OK)
             .describedAs(entity.toString())
@@ -283,7 +342,7 @@ public class ActivitiGraphQLControllerIT {
 
         query.setVariables(variables);
 
-        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query), Result.class);
+        ResponseEntity<Result> entity = rest.postForEntity(GRPAPHQL_URL, new HttpEntity<>(query, authHeaders), Result.class);
 
         assertThat(HttpStatus.OK)
             .describedAs(entity.toString())
