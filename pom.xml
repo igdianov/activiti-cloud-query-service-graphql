@@ -60,9 +60,9 @@
     
   <modules>
     <module>dependencies-tests</module>
-    <module>activiti-cloud-graphql-dependencies</module>
-    <module>activiti-cloud-services-graphql</module>
-    <module>activiti-cloud-starter-graphql</module>
+    <module>dependencies</module>
+    <module>services</module>
+    <module>starter</module>
   </modules>
   <scm>
     <url>https://github.com/Activiti/activiti-cloud-query-graphql</url>
