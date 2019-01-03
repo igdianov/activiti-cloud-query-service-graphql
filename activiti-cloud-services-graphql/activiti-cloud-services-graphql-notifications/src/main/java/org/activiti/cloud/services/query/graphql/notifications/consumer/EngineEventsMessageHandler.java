@@ -24,6 +24,7 @@ import org.activiti.cloud.services.query.graphql.notifications.config.Notificati
 import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -45,18 +46,24 @@ public class EngineEventsMessageHandler {
         this.transformer = transformer;
     }
 
-    @StreamListener(NotificationsChannels.NOTIFICATIONS_CONSUMER)
-    public void receive(Message<List<Map<String,Object>>> source) {
-        List<Map<String,Object>> events = source.getPayload();
-        String sourceRoutingKey = (String) source.getHeaders().get("routingKey");
-
-        logger.info("Recieved source message with routingKey: {}", sourceRoutingKey);
+    @StreamListener
+    public void receive(@Input(NotificationsChannels.NOTIFICATIONS_CONSUMER) 
+                            Flux<Message<List<Map<String,Object>>>> input) {
         
-        Flux.fromIterable(transformer.transform(events))
-            .map(engineEvent -> MessageBuilder.createMessage(engineEvent, source.getHeaders()))
-            .doOnNext(engineEventsSink::next)
-            .doOnError(error -> logger.error("Error handling message with routingKey: " + sourceRoutingKey, error))
-            .retry()
-            .subscribe();
+        // Let's process and transform message from input stream
+        input.flatMapSequential(message -> {
+            List<Map<String, Object>> events = message.getPayload();
+            String routingKey = (String) message.getHeaders().get("routingKey");
+
+            logger.info("Recieved source message with routingKey: {}", routingKey);
+
+            return Flux.fromIterable(transformer.transform(events))
+                       .map(engineEvent -> MessageBuilder.<EngineEvent> createMessage(engineEvent,
+                                                                                      message.getHeaders()));
+        })
+        .doOnNext(engineEventsSink::next)
+        .doOnError(error -> logger.error("Error handling message ", error))
+        .retry()
+        .subscribe();
     }
 }

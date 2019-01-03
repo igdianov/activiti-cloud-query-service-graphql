@@ -53,6 +53,10 @@ import org.springframework.web.socket.messaging.SubProtocolHandler;
 
 public class GraphQLBrokerSubProtocolHandler implements SubProtocolHandler, ApplicationEventPublisherAware {
 
+    private static final int DEFAULT_KA_INTERVAL = 5000;
+
+    private static final String KA_INTERVAL_HEADER = "kaInterval";
+
     private static final String X_AUTHORIZATION = "X-Authorization";
 
     private static final String GRAPHQL_MESSAGE_TYPE = "graphQLMessageType";
@@ -97,7 +101,7 @@ public class GraphQLBrokerSubProtocolHandler implements SubProtocolHandler, Appl
 		if(message instanceof TextMessage) {
 			TextMessage textMessage = (TextMessage) message;
 
-			GraphQLMessage payload = objectMapper.reader()
+			GraphQLMessage sourceMessage = objectMapper.reader()
 					.forType(GraphQLMessage.class)
 					.readValue(textMessage.getPayload());
 
@@ -109,36 +113,40 @@ public class GraphQLBrokerSubProtocolHandler implements SubProtocolHandler, Appl
 				headerAccessor.setSessionAttributes(session.getAttributes());
 				headerAccessor.setUser(getUser(session));
 				headerAccessor.setLeaveMutable(true);
-				Message<GraphQLMessage> decodedMessage = MessageBuilder.createMessage(payload, headerAccessor.getMessageHeaders());
+				Message<GraphQLMessage> decodedMessage = MessageBuilder.createMessage(sourceMessage, headerAccessor.getMessageHeaders());
 
-                headerAccessor.setHeader(GRAPHQL_MESSAGE_TYPE, payload.getType().toString());
+                headerAccessor.setHeader(GRAPHQL_MESSAGE_TYPE, sourceMessage.getType().toString());
 
 				if (logger.isTraceEnabled()) {
 					logger.trace("From client: " + headerAccessor.getShortLogMessage(message.getPayload()));
 				}
 
-				boolean isConnect = GraphQLMessageType.CONNECTION_INIT.equals(payload.getType());
+				boolean isConnect = GraphQLMessageType.CONNECTION_INIT.equals(sourceMessage.getType());
 				if (isConnect) {
 					this.stats.incrementConnectCount();
 					
-					if( payload.payload != null) {
-                        // inject bearer token
-    	                headerAccessor.setHeader(X_AUTHORIZATION, payload.payload.get(X_AUTHORIZATION));
-    
-    	                // inject client KA interval
-    	                Integer kaInterval = Optional.ofNullable((Integer)payload.payload.get(StompHeaderAccessor.HEART_BEAT_HEADER))
-    	                                             .orElse(5000);
+                    // Let's inject connectionParams into headers
+					Optional.ofNullable(sourceMessage.payload)
+					    .ifPresent(map -> {
+					        map.entrySet().forEach(e-> {
+        					   headerAccessor.setHeader(e.getKey(), e.getValue());               
+					        });
+					    });
+
+	                // inject client KA interval
+	                Integer kaInterval = Optional.ofNullable(headerAccessor.getHeader(KA_INTERVAL_HEADER))
+	                                             .map(v -> Integer.parseInt(v.toString()))
+	                                             .orElse(DEFAULT_KA_INTERVAL);
     	                
-    	                headerAccessor.setHeader(StompHeaderAccessor.HEART_BEAT_HEADER, new long[] {0, kaInterval});
-					}
+	                headerAccessor.setHeader(StompHeaderAccessor.HEART_BEAT_HEADER, new long[] {0, kaInterval});
 				}
-				else if (GraphQLMessageType.CONNECTION_TERMINATE.equals(payload.getType())) {
+				else if (GraphQLMessageType.CONNECTION_TERMINATE.equals(sourceMessage.getType())) {
 					this.stats.incrementDisconnectCount();
 				}
-				else if (GraphQLMessageType.START.equals(payload.getType())) {
+				else if (GraphQLMessageType.START.equals(sourceMessage.getType())) {
                     this.stats.incrementStartCount();
                 }
-                else if (GraphQLMessageType.STOP.equals(payload.getType())) {
+                else if (GraphQLMessageType.STOP.equals(sourceMessage.getType())) {
                     this.stats.incrementStopCount();
                 }
 
@@ -149,18 +157,18 @@ public class GraphQLBrokerSubProtocolHandler implements SubProtocolHandler, Appl
 					if (sent) {
 						if (isConnect) {
 							Principal user = headerAccessor.getUser();
-							if (user != null && user == session.getPrincipal()) {
-								this.graphqlAuthentications.put(session.getId(), user);
+							if (user != null && user != session.getPrincipal()) {
+							    this.graphqlAuthentications.put(session.getId(), user);
 							}
 						}
 						if (this.eventPublisher != null) {
 							if (isConnect) {
 								publishEvent(new GraphQLSessionConnectEvent(this, decodedMessage, getUser(session)));
 							}
-							else if (GraphQLMessageType.START.equals(payload.getType())) {
+							else if (GraphQLMessageType.START.equals(sourceMessage.getType())) {
 								publishEvent(new GraphQLSessionSubscribeEvent(this, decodedMessage, getUser(session)));
 							}
-							else if (GraphQLMessageType.STOP.equals(payload.getType())) {
+							else if (GraphQLMessageType.STOP.equals(sourceMessage.getType())) {
 								publishEvent(new GraphQLSessionUnsubscribeEvent(this, decodedMessage, getUser(session)));
 							}
 						}
@@ -175,7 +183,7 @@ public class GraphQLBrokerSubProtocolHandler implements SubProtocolHandler, Appl
 					logger.error("Failed to send client message to application via MessageChannel" +
 							" in session " + session.getId() + ". Sending CONNECTION_ERROR to client.", ex);
 				}
-				sendErrorMessage(session, ex, payload);
+				sendErrorMessage(session, ex, sourceMessage);
 			}
 
 		}

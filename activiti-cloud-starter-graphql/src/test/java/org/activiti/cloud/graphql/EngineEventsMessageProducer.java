@@ -4,44 +4,91 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
-import org.springframework.cloud.stream.reactive.StreamEmitter;
-import org.springframework.messaging.Message;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.context.Context;
 
 @Component
 @EnableBinding(EngineEventsMessageProducer.ProducerChannels.class)
-public class EngineEventsMessageProducer {
+public class EngineEventsMessageProducer implements SmartLifecycle {
+    
+    private static final Logger logger = LoggerFactory.getLogger(EngineEventsMessageProducer.class);
     
     public interface ProducerChannels {
         @Output("producer")
         MessageChannel engineEvents();
     }    
+
+    private final ProducerChannels producerChannels;
     
-    @StreamEmitter
-    @Output("producer")
-    public Flux<Message<List<Map<String, Object>>>> emit() throws JsonParseException, JsonMappingException, IOException {
-        List<Map<String, Object>> events = new ObjectMapper().readValue(json, new TypeReference<List<Map<String,Object>>>(){});
-        
-        return Flux.interval(Duration.ofMillis(0), Duration.ofMillis(1000), Schedulers.single())
-                   .onBackpressureDrop()
-                   .map(interval -> MessageBuilder.withPayload(events)
-                                                  .setHeader("routingKey", String.valueOf(interval))
-                                                  .build())
-                   .doOnError(System.out::println)
-                   .retry();
+    private Disposable control;
+    
+    public EngineEventsMessageProducer(ProducerChannels producerChannels) {
+        this.producerChannels = producerChannels;
     }
 
+    @Override
+    public void start() {
+        List<Map<String, Object>> events;
+        
+        try {
+            events = new ObjectMapper().readValue(json, new TypeReference<List<Map<String,Object>>>(){});
+
+            control = Flux.interval(Duration.ofMillis(0), Duration.ofMillis(1000), Schedulers.single())
+                          .doOnNext(m -> logger.info("Emitting interval: {}", m))
+                          .flatMap(interval -> Mono.subscriberContext()
+                                                   .map(ctx -> ctx.get(AtomicInteger.class).toString())
+                                                   .map(routingKey -> MessageBuilder.withPayload(events)
+                                                                                    .setHeader("routingKey", routingKey)
+                                                                                    .build()))
+                          .doOnNext(producerChannels.engineEvents()::send)
+                          .doOnError(e -> logger.error("Error during processing: ", e))
+                          .retryBackoff(Integer.MAX_VALUE, Duration.ofSeconds(1))
+                          .doOnEach(signal -> signal.getContext().get(AtomicInteger.class).getAndIncrement())
+                          .subscriberContext(Context.of(AtomicInteger.class, new AtomicInteger()))
+                          .subscribe();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void stop() {
+        control.dispose();
+        
+    }
+
+    @Override
+    public boolean isRunning() {
+        return (control != null && !control.isDisposed());
+    }
+    
+//    // Does not recover on RabbitMq restart    
+//    @StreamEmitter
+//    @Output("producer")
+//    public void emit(FluxSender output) throws JsonParseException, JsonMappingException, IOException {
+//        List<Map<String, Object>> events = new ObjectMapper().readValue(json, new TypeReference<List<Map<String,Object>>>(){});
+//        
+//        output.send(Flux.interval(Duration.ofMillis(0), Duration.ofMillis(1000), Schedulers.single())
+//                        .map(interval -> MessageBuilder.withPayload(events)
+//                                                       .setHeader("routingKey", String.valueOf(interval))
+//                                                       .build()));
+//    }
+    
     private static String json =
     "[  \r\n" + 
     "   {  \r\n" + 

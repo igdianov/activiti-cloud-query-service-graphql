@@ -56,6 +56,7 @@ import reactor.test.StepVerifier;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ActivitiGraphQLControllerIT {
 
+    private static final String WS_GRAPHQL_URI = "/ws/graphql";
     private static final String GRAPHQL_WS = "graphql-ws";
     private static final String HRUSER = "hruser";
     private static final String AUTHORIZATION = "Authorization";
@@ -110,12 +111,12 @@ public class ActivitiGraphQLControllerIT {
                   .wiretap(true)
                   .headers(h -> h.add(AUTHORIZATION, auth))
                   .websocket(GRAPHQL_WS)
-                  .uri("/ws/graphql")
+                  .uri(WS_GRAPHQL_URI)
                   .handle((i, o) -> {
                       o.options(NettyPipeline.SendOptions::flushOnEach)
                        .sendString(Mono.just(initMessage))
                        .then()
-                       .log()
+                       .log("client-send")
                        .subscribe();
                       
                       return i.receive().asString();
@@ -137,7 +138,7 @@ public class ActivitiGraphQLControllerIT {
     }
     
     @Test
-    public void testGraphqlWsSubprotocolServerUnauthorized() {
+    public void testGraphqlWsSubprotocolServerWithUserRoleNotAuthorized() {
         ReplayProcessor<String> output = ReplayProcessor.create();
 
         keycloakTokenProducer.setKeycloakTestUser(HRUSER);
@@ -146,34 +147,68 @@ public class ActivitiGraphQLControllerIT {
         
         String initMessage = "{\"type\":\"connection_init\",\"payload\":{}}";
         
-        
         HttpClient.create()
                   .baseUrl("ws://localhost:"+port)
                   .wiretap(true)
                   .headers(h -> h.add(AUTHORIZATION, auth))
                   .websocket(GRAPHQL_WS)
-                  .uri("/ws/graphql")
+                  .uri(WS_GRAPHQL_URI)
                   .handle((i, o) -> {
                       o.options(NettyPipeline.SendOptions::flushOnEach)
                        .sendString(Mono.just(initMessage))
                        .then()
-                       .log()
+                       .log("client-send")
                        .subscribe();
                       
                       return i.receive().asString();
                   })
                   .log("client-received")
-                  .take(2)
+                  .take(1)
                   .subscribeWith(output)
                   .collectList()
                   .doOnError(i -> System.err.println("Failed requesting server: " + i))
                   .subscribe();
         
+        String expected = "{\"payload\":{},\"id\":null,\"type\":\"connection_error\",\"headers\":{}}";
+        
         StepVerifier.create(output)
-                    .expectError()
-                    .verifyThenAssertThat(TIMEOUT)
-                    .hasOperatorErrorWithMessageContaining("Invalid handshake response getStatus: 403")
-                    ;
+                    .expectNext(expected)
+                    .verifyComplete();
+    }    
+
+    @Test
+    public void testGraphqlWsSubprotocolServerUnauthorized() {
+        ReplayProcessor<String> output = ReplayProcessor.create();
+
+        String initMessage = "{\"type\":\"connection_init\",\"payload\":{}}";
+        
+        HttpClient.create()
+                  .baseUrl("ws://localhost:"+port)
+                  .wiretap(true)
+                  //.headers(h -> h.add(AUTHORIZATION, auth)) // Anonymous request
+                  .websocket(GRAPHQL_WS)
+                  .uri(WS_GRAPHQL_URI)
+                  .handle((i, o) -> {
+                      o.options(NettyPipeline.SendOptions::flushOnEach)
+                       .sendString(Mono.just(initMessage))
+                       .then()
+                       .log("client-send")
+                       .subscribe();
+                      
+                      return i.receive().asString();
+                  })
+                  .log("client-received")
+                  .take(1)
+                  .subscribeWith(output)
+                  .collectList()
+                  .doOnError(i -> System.err.println("Failed requesting server: " + i))
+                  .subscribe();
+        
+        String expected = "{\"payload\":{},\"id\":null,\"type\":\"connection_error\",\"headers\":{}}";
+        
+        StepVerifier.create(output)
+                    .expectNext(expected)
+                    .verifyComplete();
     }    
     
     @Test

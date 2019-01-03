@@ -26,32 +26,25 @@
       If you do not want to rely on a CDN, you can host these files locally or
       include them directly in your favored resource bunder.
       -->
-    <script
-      src="//cdn.jsdelivr.net/es6-promise/4.0.5/es6-promise.auto.min.js"></script>
-    <script src="//cdn.jsdelivr.net/fetch/0.9.0/fetch.min.js"></script>
-    <script src="//cdn.jsdelivr.net/react/15.4.2/react.min.js"></script>
-    <script src="//cdn.jsdelivr.net/react/15.4.2/react-dom.min.js"></script>
+    <script src="vendor/cdn.jsdelivr.net/es6-promise/4.0.5/es6-promise.auto.min.js"></script>
+    <script src="vendor/cdn.jsdelivr.net/fetch/0.9.0/fetch.min.js"></script>
+    <script src="vendor/cdn.jsdelivr.net/react/15.4.2/react.min.js"></script>
+    <script src="vendor/cdn.jsdelivr.net/react/15.4.2/react-dom.min.js"></script>
     <!--
       These two files can be found in the npm module, however you may wish to
       copy them directly into your environment, or perhaps include them in your
       favored resource bundler.
       -->
     <link rel="stylesheet" href="graphiql.css" />
-    <link href="//cdn.jsdelivr.net/npm/codemirror@5/theme/solarized.min.css" rel="stylesheet" />
     <script src="graphiql.js"></script>
-    <script src="//unpkg.com/subscriptions-transport-ws@0.8.3/browser/client.js"></script>
-    <script src="//unpkg.com/graphiql-subscriptions-fetcher@0.0.2/browser/client.js"></script>
-    <script src="//localhost:8180/auth/js/keycloak.js"></script>
+    <script src="vendor/unpkg.com/subscriptions-transport-ws@0.8.3/browser/client.js"></script>
+    <script src="vendor/unpkg.com/graphiql-subscriptions-fetcher@0.0.2/browser/client.js"></script>
+    <script src="vendor/keycloak/auth/js/keycloak.js"></script>
   </head>
   <body>
     <div id="graphiql">Loading...</div>
     <script>
-      var keycloak = Keycloak({
-          url: 'http://localhost:8180/auth',
-          realm: 'activiti',
-          clientId: 'activiti',
-          'public-client': true,
-        });
+      var keycloak = Keycloak('keycloak.json');
 
       // Ensures string values are safe to be used within a <script> tag.
       function safeSerialize(data) {
@@ -122,7 +115,7 @@
       }
 
       keycloak.init({
-          onLoad: 'check-sso',
+          onLoad: 'login-required',
         })
         .success(function(authenticated) {
           
@@ -137,7 +130,10 @@
               // This example expects a GraphQL server at the path /graphql.
               // Change this to point wherever you host your GraphQL server.
               return keycloak.updateToken().then(result => {
-                 return fetch('/graphql', {
+                  //Experimental
+                  //document.cookie = 'X-Authorization=Bearer ' + getToken() + '; path=/';
+
+                  return fetch('/graphql', {
                    method: 'post',
                    headers: {
                      'Accept': 'application/json',
@@ -164,10 +160,15 @@
           //  create a SubscriptionClient with your subscriptions endpoint
           var subscriptionsClient = new window.SubscriptionsTransportWs.SubscriptionClient( wsURL,
                   { connectionParams: {
-                     'simpHeartbeat': 2000
+                     'kaInterval': 2000,
+                     // experimental
+                     //stomp: { 
+                     //    'id' : 'myid',
+                     //    'durable' : true,
+                     //    'auto-delete': false,
+                     //},
+                     //'X-Authorization': getToken()
                   }, reconnect: true, lazy: true });
-
-          //document.cookie = 'X-Authorization=Bearer ' + getToken() + '; path=/';
 
           var subscriptionsFetcher = window.GraphiQLSubscriptionsFetcher.graphQLFetcher(subscriptionsClient, graphQLFetcher);
 

@@ -42,10 +42,10 @@ public class KeycloakTokenVerifier {
         PublicKey pk = getPublicKey(tokenVerifier.getHeader());
 
         return tokenVerifier.withDefaultChecks()
-                     .realmUrl(getRealmUrl())
-                     .publicKey(pk)
-                     .verify()
-                     .getToken();
+                            .realmUrl(getRealmUrl())
+                            .publicKey(pk)
+                            .verify()
+                            .getToken();
     }
     
     protected PublicKey getPublicKey(JWSHeader jwsHeader) {
