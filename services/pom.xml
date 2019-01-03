@@ -8,6 +8,9 @@
   </parent>
   <artifactId>activiti-cloud-services-notifications-graphql</artifactId>
   <packaging>pom</packaging>
+
+  <name>Activiti Cloud Notifications :: Services :: GraphQL Parent</name>
+
   <modules>
     <module>config</module>
     <module>graphiql</module>

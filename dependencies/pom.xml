@@ -9,6 +9,8 @@
     <relativePath>..</relativePath>
   </parent>
 
+  <name>Activiti Cloud Notifications :: GraphQL Dependencies (Bill Of Materials)</name>
+
   <artifactId>activiti-cloud-notifications-graphql-dependencies</artifactId>
   <packaging>pom</packaging>
 

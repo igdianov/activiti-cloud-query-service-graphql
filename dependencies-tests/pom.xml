@@ -9,7 +9,7 @@
   <artifactId>activiti-cloud-notifications-service-graphql-dependencies-tests</artifactId>
   <packaging>pom</packaging>
   
-  <name>Activiti Cloud :: GraphQL Dependencies BOM (Bill Of Materials) Tests</name>
+  <name>Activiti Cloud Notifications :: GraphQL Dependencies (Bill Of Materials) Tests</name>
 
   <properties>
     <maven.deploy.skip>true</maven.deploy.skip>
