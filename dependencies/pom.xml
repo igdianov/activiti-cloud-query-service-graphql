@@ -3,13 +3,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.activiti.cloud.graphql</groupId>
-    <artifactId>activiti-cloud-graphql-service-parent</artifactId>
+    <groupId>org.activiti.cloud.notifications.graphql</groupId>
+    <artifactId>activiti-cloud-notifications-service-graphql-parent</artifactId>
     <version>7.0.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
-  <artifactId>activiti-cloud-graphql-dependencies</artifactId>
+  <artifactId>activiti-cloud-notifications-graphql-dependencies</artifactId>
   <packaging>pom</packaging>
 
   <dependencyManagement>
@@ -29,53 +29,53 @@
         <type>pom</type>
       </dependency>
       <dependency>
-        <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-config</artifactId>
+        <groupId>org.activiti.cloud.notifications.graphql</groupId>
+        <artifactId>activiti-cloud-services-notifications-graphql-config</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-graphiql</artifactId>
+        <groupId>org.activiti.cloud.notifications.graphql</groupId>
+        <artifactId>activiti-cloud-services-notifications-graphql-graphiql</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-ws-api</artifactId>
+        <groupId>org.activiti.cloud.notifications.graphql</groupId>
+        <artifactId>activiti-cloud-services-notifications-graphql-ws</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-ws-subscriptions</artifactId>
+        <groupId>org.activiti.cloud.notifications.graphql</groupId>
+        <artifactId>activiti-cloud-services-notifications-graphql-ws-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-ws-security</artifactId>
+        <groupId>org.activiti.cloud.notifications.graphql</groupId>
+        <artifactId>activiti-cloud-services-notifications-graphql-ws-subscriptions</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-ws</artifactId>
+        <groupId>org.activiti.cloud.notifications.graphql</groupId>
+        <artifactId>activiti-cloud-services-notifications-graphql-ws-security</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-jpa-query</artifactId>
+        <groupId>org.activiti.cloud.notifications.graphql</groupId>
+        <artifactId>activiti-cloud-services-notifications-graphql-jpa-query</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-web</artifactId>
+        <groupId>org.activiti.cloud.notifications.graphql</groupId>
+        <artifactId>activiti-cloud-services-notifications-graphql-web</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-notifications</artifactId>
+        <groupId>org.activiti.cloud.notifications.graphql</groupId>
+        <artifactId>activiti-cloud-services-notifications-graphql-events</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti.cloud.graphql</groupId>
-        <artifactId>activiti-cloud-services-graphql-ws-stomp</artifactId>
+        <groupId>org.activiti.cloud.notifications.graphql</groupId>
+        <artifactId>activiti-cloud-services-notifications-graphql-ws-stomp</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>

@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.activiti.cloud.graphql</groupId>
-    <artifactId>activiti-cloud-graphql-dependencies</artifactId>
+    <groupId>org.activiti.cloud.notifications.graphql</groupId>
+    <artifactId>activiti-cloud-notifications-graphql-dependencies</artifactId>
     <version>7.0.0-SNAPSHOT</version>
     <relativePath>../dependencies</relativePath>
   </parent>
-  <artifactId>activiti-cloud-services-graphql</artifactId>
+  <artifactId>activiti-cloud-services-notifications-graphql</artifactId>
   <packaging>pom</packaging>
   <modules>
     <module>config</module>
@@ -14,7 +14,7 @@
     <module>web</module>
     <module>ws</module>
     <module>ws-subscriptions</module>
-    <module>notifications</module>
+    <module>events</module>
     <module>ws-stomp</module>
     <module>ws-security</module>
     <module>jpa-query</module>

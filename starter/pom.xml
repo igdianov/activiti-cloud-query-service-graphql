@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.activiti.cloud.graphql</groupId>
-    <artifactId>activiti-cloud-graphql-dependencies</artifactId>
+    <groupId>org.activiti.cloud.notifications.graphql</groupId>
+    <artifactId>activiti-cloud-notifications-graphql-dependencies</artifactId>
     <version>7.0.0-SNAPSHOT</version>
     <relativePath>../dependencies</relativePath>
   </parent>
-  <artifactId>activiti-cloud-starter-graphql</artifactId>
+  <artifactId>activiti-cloud-starter-notifications-graphql</artifactId>
   
-  <name>Activiti Cloud GraphQL :: Starter :: GraphQL</name>
+  <name>Activiti Cloud Notifications :: Starter :: GraphQL</name>
   <dependencies>
     <dependency>
       <groupId>org.activiti.cloud.common</groupId>
@@ -31,36 +31,36 @@
       <artifactId>activiti-cloud-services-logging</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.activiti.cloud.graphql</groupId>
-      <artifactId>activiti-cloud-services-graphql-config</artifactId>
+      <groupId>org.activiti.cloud.notifications.graphql</groupId>
+      <artifactId>activiti-cloud-services-notifications-graphql-config</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.activiti.cloud.graphql</groupId>
-      <artifactId>activiti-cloud-services-graphql-notifications</artifactId>
+      <groupId>org.activiti.cloud.notifications.graphql</groupId>
+      <artifactId>activiti-cloud-services-notifications-graphql-events</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.activiti.cloud.graphql</groupId>
-      <artifactId>activiti-cloud-services-graphql-jpa-query</artifactId>
+      <groupId>org.activiti.cloud.notifications.graphql</groupId>
+      <artifactId>activiti-cloud-services-notifications-graphql-jpa-query</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.activiti.cloud.graphql</groupId>
-      <artifactId>activiti-cloud-services-graphql-web</artifactId>
+      <groupId>org.activiti.cloud.notifications.graphql</groupId>
+      <artifactId>activiti-cloud-services-notifications-graphql-web</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.activiti.cloud.graphql</groupId>
-      <artifactId>activiti-cloud-services-graphql-graphiql</artifactId>
+      <groupId>org.activiti.cloud.notifications.graphql</groupId>
+      <artifactId>activiti-cloud-services-notifications-graphql-graphiql</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.activiti.cloud.graphql</groupId>
-      <artifactId>activiti-cloud-services-graphql-ws</artifactId>
+      <groupId>org.activiti.cloud.notifications.graphql</groupId>
+      <artifactId>activiti-cloud-services-notifications-graphql-ws</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.activiti.cloud.graphql</groupId>
-      <artifactId>activiti-cloud-services-graphql-ws-security</artifactId>
+      <groupId>org.activiti.cloud.notifications.graphql</groupId>
+      <artifactId>activiti-cloud-services-notifications-graphql-ws-security</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.activiti.cloud.graphql</groupId>
-      <artifactId>activiti-cloud-services-graphql-ws-subscriptions</artifactId>
+      <groupId>org.activiti.cloud.notifications.graphql</groupId>
+      <artifactId>activiti-cloud-services-notifications-graphql-ws-subscriptions</artifactId>
     </dependency>
     <dependency>
       <groupId>org.activiti.cloud.common</groupId>

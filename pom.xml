@@ -9,9 +9,9 @@
     <relativePath/>
   </parent>
 
-  <groupId>org.activiti.cloud.graphql</groupId>
-  <artifactId>activiti-cloud-graphql-service-parent</artifactId>
-  <name>Activiti Cloud GraphQL Service :: Parent</name>
+  <groupId>org.activiti.cloud.notifications.graphql</groupId>
+  <artifactId>activiti-cloud-notifications-service-graphql-parent</artifactId>
+  <name>Activiti Cloud Notifications GraphQL Service :: Parent</name>
   <version>7.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <url>http://activiti.org</url>
@@ -19,7 +19,7 @@
   <properties>
       <activiti-cloud-build.version>7.0.36</activiti-cloud-build.version>
       <activiti-cloud-query-dependencies.version>7.0.74</activiti-cloud-query-dependencies.version>
-      <activiti-cloud-query-service-graphql.version>${project.version}</activiti-cloud-query-service-graphql.version>
+      <activiti-cloud-notifications-service-graphql.version>${project.version}</activiti-cloud-notifications-service-graphql.version>
       <graphql-jpa-query.version>0.3.11</graphql-jpa-query.version>
   </properties>
 
@@ -65,14 +65,14 @@
     <module>starter</module>
   </modules>
   <scm>
-    <url>https://github.com/Activiti/activiti-cloud-query-graphql</url>
-    <connection>scm:git:https://github.com/Activiti/activiti-cloud-query-graphql.git</connection>
-    <developerConnection>scm:git:https://github.com/Activiti/activiti-cloud-query-graphql.git</developerConnection>
+    <url>https://github.com/Activiti/activiti-cloud-notifications-service-graphql</url>
+    <connection>scm:git:https://github.com/Activiti/activiti-cloud-notifications-service-graphql.git</connection>
+    <developerConnection>scm:git:https://github.com/Activiti/activiti-cloud-notifications-service-graphql.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
   <ciManagement>
     <system>Travis</system>
-    <url>https://travis-ci.org/Activiti/activiti-cloud-query-service</url>
+    <url>https://travis-ci.org/Activiti/activiti-cloud-notifications-service-graphql</url>
   </ciManagement>
   <repositories>
     <repository>
