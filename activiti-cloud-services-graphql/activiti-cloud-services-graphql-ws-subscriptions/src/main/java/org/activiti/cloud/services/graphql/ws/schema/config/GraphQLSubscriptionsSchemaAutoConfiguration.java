@@ -20,17 +20,22 @@ import org.activiti.cloud.graphql.config.GraphQLSchemaConfigurer;
 import org.activiti.cloud.graphql.config.GraphQLShemaRegistration;
 import org.activiti.cloud.services.graphql.ws.schema.GraphQLSubscriptionSchemaBuilder;
 import org.activiti.cloud.services.graphql.ws.schema.GraphQLSubscriptionSchemaProperties;
+import org.activiti.cloud.services.graphql.ws.schema.datafetcher.EngineEventsFluxPublisherFactory;
 import org.activiti.cloud.services.graphql.ws.schema.datafetcher.EngineEventsPublisherDataFetcher;
 import org.activiti.cloud.services.graphql.ws.schema.datafetcher.EngineEventsPublisherFactory;
 import org.activiti.cloud.services.graphql.ws.schema.datafetcher.StompRelayFluxPublisherFactory;
+import org.activiti.cloud.services.query.graphql.notifications.RoutingKeyResolver;
+import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.ReactorNettyTcpStompClient;
+import reactor.core.publisher.Flux;
 
 @Configuration
 @ConditionalOnClass({GraphQL.class, ReactorNettyTcpStompClient.class})
@@ -43,7 +48,7 @@ public class GraphQLSubscriptionsSchemaAutoConfiguration {
         @Autowired
         private GraphQLSubscriptionSchemaProperties subscriptionProperties;
 
-        @Bean
+        //@Bean
         @ConditionalOnMissingBean
         public ReactorNettyTcpStompClient stompClient() {
             ReactorNettyTcpStompClient stompClient = new ReactorNettyTcpStompClient(subscriptionProperties.getRelayHost(),
@@ -53,19 +58,19 @@ public class GraphQLSubscriptionsSchemaAutoConfiguration {
             return stompClient;
         }
 
-        @Bean
+        //@Bean
         @ConditionalOnMissingBean
         public EngineEventsPublisherFactory stompRelayPublisherFactory(ReactorNettyTcpStompClient stompClient) {
             return new StompRelayFluxPublisherFactory(stompClient).login(subscriptionProperties.getClientLogin())
                                                                   .passcode(subscriptionProperties.getClientPasscode());
         }
 
-//        @Bean
-//        @ConditionalOnMissingBean
-//        public EngineEventsPublisherFactory engineEventPublisherFactory(RoutingKeyResolver routingKeyResolver,
-//                                                                       Flux<Message<EngineEvent>> engineEventsFlux) {
-//            return new EngineEventsFluxPublisherFactory(engineEventsFlux, routingKeyResolver);
-//        }
+        @Bean
+        @ConditionalOnMissingBean
+        public EngineEventsPublisherFactory engineEventPublisherFactory(RoutingKeyResolver routingKeyResolver,
+                                                                       Flux<Message<EngineEvent>> engineEventsFlux) {
+            return new EngineEventsFluxPublisherFactory(engineEventsFlux, routingKeyResolver);
+        }
 
         @Bean
         @ConditionalOnMissingBean

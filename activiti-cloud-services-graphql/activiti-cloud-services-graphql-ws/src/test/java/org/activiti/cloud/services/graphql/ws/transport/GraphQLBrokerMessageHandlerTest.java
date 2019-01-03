@@ -37,6 +37,8 @@ import javax.websocket.Session;
 import graphql.ExecutionResult;
 import graphql.ExecutionResultImpl;
 import graphql.GraphQLError;
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessage;
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessageType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

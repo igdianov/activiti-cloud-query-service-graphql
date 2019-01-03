@@ -18,7 +18,6 @@ package org.activiti.cloud.services.query.graphql.notifications;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.activiti.cloud.services.query.graphql.notifications.model.EngineEvent;
-import org.activiti.cloud.services.query.graphql.notifications.producer.SpELTemplateRoutingKeyResolver;
 import org.junit.Test;
 
 public class SpELRoutingKeyTest {

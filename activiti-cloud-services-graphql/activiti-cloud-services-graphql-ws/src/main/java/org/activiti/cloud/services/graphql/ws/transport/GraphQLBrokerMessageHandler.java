@@ -26,6 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.codahale.metrics.annotation.Timed;
 import graphql.ExecutionResult;
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessage;
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessageType;
 import org.activiti.cloud.services.graphql.ws.util.QueryParameters;
 import org.reactivestreams.Publisher;
 import org.springframework.context.event.EventListener;

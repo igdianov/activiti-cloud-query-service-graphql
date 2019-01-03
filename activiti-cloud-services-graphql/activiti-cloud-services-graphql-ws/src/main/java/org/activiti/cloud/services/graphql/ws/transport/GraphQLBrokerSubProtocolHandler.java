@@ -31,6 +31,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.codahale.metrics.annotation.Gauge;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessage;
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessageType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEvent;
@@ -126,7 +128,7 @@ public class GraphQLBrokerSubProtocolHandler implements SubProtocolHandler, Appl
 					this.stats.incrementConnectCount();
 					
                     // Let's inject connectionParams into headers
-					Optional.ofNullable(sourceMessage.payload)
+					Optional.ofNullable(sourceMessage.getPayload())
 					    .ifPresent(map -> {
 					        map.entrySet().forEach(e-> {
         					   headerAccessor.setHeader(e.getKey(), e.getValue());               

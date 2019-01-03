@@ -30,9 +30,9 @@ import java.util.Collections;
 
 import javax.websocket.Session;
 
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessage;
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessageType;
 import org.activiti.cloud.services.graphql.ws.transport.GraphQLBrokerSubProtocolHandler;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLMessage;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLMessageType;
 import org.activiti.cloud.services.graphql.ws.transport.GraphQLSessionConnectEvent;
 import org.activiti.cloud.services.graphql.ws.transport.GraphQLSessionDisconnectEvent;
 import org.activiti.cloud.services.graphql.ws.transport.GraphQLSessionSubscribeEvent;

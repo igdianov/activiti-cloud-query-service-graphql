@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import graphql.ExecutionResult;
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessage;
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessageType;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;

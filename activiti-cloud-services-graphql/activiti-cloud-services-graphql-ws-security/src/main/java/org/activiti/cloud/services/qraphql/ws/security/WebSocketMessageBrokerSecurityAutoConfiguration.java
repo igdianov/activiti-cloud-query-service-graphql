@@ -20,14 +20,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 
 @Configuration
 @ConditionalOnProperty(name="spring.activiti.cloud.services.graphql.ws.security.enabled", matchIfMissing = true)
 public class WebSocketMessageBrokerSecurityAutoConfiguration {
 
     @Configuration
-    @Import(KeycloakJsonController.class)
+    @PropertySources(value= {
+            @PropertySource(value="classpath:META-INF/graphql-ws-security.properties"),
+            @PropertySource(value="classpath:graphql-ws-security.properties", ignoreResourceNotFound = true)
+    })
     public static class DefaultWebSocketMessageBrokerSecurityConfiguration {
 
         @Bean

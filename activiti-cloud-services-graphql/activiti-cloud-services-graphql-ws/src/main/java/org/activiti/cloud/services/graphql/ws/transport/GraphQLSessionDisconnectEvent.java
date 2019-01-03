@@ -17,6 +17,7 @@ package org.activiti.cloud.services.graphql.ws.transport;
 
 import java.security.Principal;
 
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessage;
 import org.springframework.messaging.Message;
 import org.springframework.util.Assert;
 import org.springframework.web.socket.CloseStatus;

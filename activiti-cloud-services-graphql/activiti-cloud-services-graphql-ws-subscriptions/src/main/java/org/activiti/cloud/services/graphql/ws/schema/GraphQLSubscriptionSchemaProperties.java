@@ -25,7 +25,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-@ConfigurationProperties(prefix="spring.activiti.cloud.services.query.graphql.ws.schema")
+@ConfigurationProperties(prefix="spring.activiti.cloud.services.query.graphql.ws.subscriptions")
 public class GraphQLSubscriptionSchemaProperties {
 
     /**
@@ -60,8 +60,8 @@ public class GraphQLSubscriptionSchemaProperties {
     private String clientPasscode;
 
     @Configuration
-    @PropertySource("classpath:META-INF/graphql-ws-schema.properties")
-    @PropertySource(value = "classpath:graphql-ws-schema.properties", ignoreResourceNotFound = true)
+    @PropertySource("classpath:META-INF/graphql-ws-subscriptions.properties")
+    @PropertySource(value = "classpath:graphql-ws-subscriptions.properties", ignoreResourceNotFound = true)
     @EnableConfigurationProperties(GraphQLSubscriptionSchemaProperties.class)
     public static class AutoConfiguration {
         // auto configures parent properties class using spring.factories

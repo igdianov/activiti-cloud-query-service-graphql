@@ -14,9 +14,9 @@ import java.util.Map;
 import javax.websocket.Session;
 
 import graphql.ExecutionResultImpl;
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessage;
+import org.activiti.cloud.services.graphql.ws.api.GraphQLMessageType;
 import org.activiti.cloud.services.graphql.ws.transport.GraphQLBrokerChannelSubscriber;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLMessage;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLMessageType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;

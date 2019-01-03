@@ -18,5 +18,6 @@
     <module>activiti-cloud-services-graphql-ws-stomp</module>
     <module>activiti-cloud-services-graphql-ws-security</module>
     <module>activiti-cloud-services-graphql-jpa-query</module>
+    <module>activiti-cloud-services-graphql-ws-api</module>
   </modules>
 </project>

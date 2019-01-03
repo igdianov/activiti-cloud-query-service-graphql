@@ -18,7 +18,7 @@ package org.activiti.cloud.services.query.graphql.notifications.model;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.activiti.cloud.services.query.graphql.notifications.producer.SpELTemplateRoutingKey;
+import org.activiti.cloud.services.query.graphql.notifications.SpELTemplateRoutingKey;
 
 @SpELTemplateRoutingKey("engineEvents.#{['serviceName']?:'_'}.#{['appName']?:'_'}.#{['processDefinitionKey']?:'_'}.#{['processInstanceId']?:'_'}.#{['businessKey']?:'_'}")
 public class EngineEvent extends LinkedHashMap<String, Object>{

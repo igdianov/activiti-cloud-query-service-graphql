@@ -11,10 +11,14 @@
   <artifactId>activiti-cloud-services-graphql-ws</artifactId>
   <name>Activiti Cloud Query :: Services :: Query GraphQL WebSockets</name>
   <dependencies>
-	<dependency>
-		<groupId>io.dropwizard.metrics</groupId>
-		<artifactId>metrics-annotation</artifactId>
-	</dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.graphql</groupId>
+      <artifactId>activiti-cloud-services-graphql-ws-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-annotation</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-websocket</artifactId>
