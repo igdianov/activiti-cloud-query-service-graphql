@@ -15,7 +15,6 @@
  */
 package org.activiti.cloud.services.query.graphql.notifications.consumer;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,9 +33,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.messaging.Message;
+import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.TopicProcessor;
 
 /**
  * Notification Gateway configuration that enables messaging channel bindings
@@ -54,13 +53,16 @@ public class ConsumerAutoConfiguration implements SmartLifecycle  {
     private final List<Subscriber<Message<EngineEvent>>> subscribers = new ArrayList<>();
     boolean running;
     
-    private TopicProcessor<Message<EngineEvent>> engineEventsProcessor = TopicProcessor.<Message<EngineEvent>> builder()
-                                                                                      .name("engineEventsProcessor")
-                                                                                      .autoCancel(false)
-                                                                                      .share(true)
-                                                                                      .bufferSize(1024)
-                                                                                      .build();    
+//    private TopicProcessor<Message<EngineEvent>> engineEventsProcessor = TopicProcessor.<Message<EngineEvent>> builder()
+//                                                                                      .name("engineEventsProcessor")
+//                                                                                      .autoCancel(false)
+//                                                                                      .share(true)
+//                                                                                      .bufferSize(1024)
+//                                                                                      .build();    
 
+    private EmitterProcessor<Message<EngineEvent>> engineEventsProcessor = EmitterProcessor.<Message<EngineEvent>>create(1024, false);    
+    
+    
     @Autowired
     public ConsumerAutoConfiguration(ConsumerProperties properties) {
         this.properties = properties;
@@ -108,7 +110,8 @@ public class ConsumerAutoConfiguration implements SmartLifecycle  {
     @Override
     public void stop() {
         try {
-            engineEventsProcessor.awaitAndShutdown(Duration.ofSeconds(5));
+            //engineEventsProcessor.awaitAndShutdown(Duration.ofSeconds(5));
+            engineEventsProcessor.onComplete();
         } finally {
             running = false;
         }

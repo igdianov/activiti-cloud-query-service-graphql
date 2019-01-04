@@ -26,17 +26,11 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Collections;
 
 import javax.websocket.Session;
 
 import org.activiti.cloud.services.graphql.ws.api.GraphQLMessage;
 import org.activiti.cloud.services.graphql.ws.api.GraphQLMessageType;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLBrokerSubProtocolHandler;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLSessionConnectEvent;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLSessionDisconnectEvent;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLSessionSubscribeEvent;
-import org.activiti.cloud.services.graphql.ws.transport.GraphQLSessionUnsubscribeEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -259,8 +253,7 @@ public class GraphQLBrokerSubProtocolHandlerTest {
         SimpMessageHeaderAccessor headerAccessor = simpHeaderAccessor(session);
 
         GraphQLMessage payload = new GraphQLMessage(operationId,
-                                                    GraphQLMessageType.CONNECTION_ACK,
-                                                    Collections.emptyMap());
+                                                    GraphQLMessageType.CONNECTION_ACK);
 
         return MessageBuilder.createMessage(payload, headerAccessor.getMessageHeaders());
     }

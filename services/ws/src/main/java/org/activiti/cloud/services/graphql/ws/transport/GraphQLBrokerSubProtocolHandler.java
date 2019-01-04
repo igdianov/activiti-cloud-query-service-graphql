@@ -288,7 +288,7 @@ public class GraphQLBrokerSubProtocolHandler implements SubProtocolHandler, Appl
 		headerAccessor.setUser(getUser(session));
 		headerAccessor.setLeaveMutable(false);
 
-        GraphQLMessage operation = new GraphQLMessage(null, GraphQLMessageType.CONNECTION_TERMINATE, Collections.emptyMap());
+        GraphQLMessage operation = new GraphQLMessage(null, GraphQLMessageType.CONNECTION_TERMINATE);
 
         return MessageBuilder.createMessage(operation, headerAccessor.getMessageHeaders());
 	}
@@ -300,7 +300,7 @@ public class GraphQLBrokerSubProtocolHandler implements SubProtocolHandler, Appl
 	protected void sendErrorMessage(WebSocketSession session, Throwable error, GraphQLMessage message) {
         this.stats.incrementErrorCount();
 
-		GraphQLMessage response = new GraphQLMessage(message.getId(), GraphQLMessageType.CONNECTION_ERROR, Collections.emptyMap());
+		GraphQLMessage response = new GraphQLMessage(message.getId(), GraphQLMessageType.CONNECTION_ERROR);
 
 		ObjectWriter writer = objectMapper.writer();
 

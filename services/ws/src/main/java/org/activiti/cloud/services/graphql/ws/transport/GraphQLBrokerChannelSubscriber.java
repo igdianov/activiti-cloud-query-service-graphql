@@ -115,7 +115,7 @@ public class GraphQLBrokerChannelSubscriber implements Subscriber<ExecutionResul
 
         cancel();
 
-        GraphQLMessage operationMessage = new GraphQLMessage(operationMessageId, GraphQLMessageType.COMPLETE, Collections.emptyMap());
+        GraphQLMessage operationMessage = new GraphQLMessage(operationMessageId, GraphQLMessageType.COMPLETE);
 
 		Message<?> responseMessage = MessageBuilder.createMessage(operationMessage, getMessageHeaders());
 

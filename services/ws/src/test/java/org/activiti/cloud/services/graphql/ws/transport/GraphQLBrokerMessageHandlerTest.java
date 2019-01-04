@@ -348,8 +348,7 @@ public class GraphQLBrokerMessageHandlerTest {
         headerAccessor.setHeader(StompHeaderAccessor.HEART_BEAT_HEADER, new long[]{0, 5000});
 
         GraphQLMessage payload = new GraphQLMessage(operationId,
-                                                    GraphQLMessageType.CONNECTION_INIT,
-                                                    Collections.emptyMap());
+                                                    GraphQLMessageType.CONNECTION_INIT);
 
         return MessageBuilder.createMessage(payload, headerAccessor.getMessageHeaders());
     }
@@ -372,8 +371,7 @@ public class GraphQLBrokerMessageHandlerTest {
         SimpMessageHeaderAccessor headerAccessor = simpHeaderAccessor(mockWebSocketSession(sessionId));
 
         GraphQLMessage payload = new GraphQLMessage(operationId,
-                                                    GraphQLMessageType.STOP,
-                                                    Collections.emptyMap());
+                                                    GraphQLMessageType.STOP);
 
         return MessageBuilder.createMessage(payload, headerAccessor.getMessageHeaders());
     }

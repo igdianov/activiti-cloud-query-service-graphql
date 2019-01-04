@@ -234,8 +234,7 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
         GraphQLMessage operationPayload = message.getPayload();
 
         GraphQLMessage connection_ack = new GraphQLMessage(operationPayload.getId(),
-                                                           GraphQLMessageType.CONNECTION_ACK,
-                                                           Collections.emptyMap());
+                                                           GraphQLMessageType.CONNECTION_ACK);
 
         MessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.getMutableAccessor(message);
 
@@ -294,10 +293,7 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
                                                                         GraphQLMessageType.ERROR,
                                                                         payload);
 
-            MessageHeaderAccessor messageHeaderAccessor = SimpMessageHeaderAccessor.getMutableAccessor(startSubscriptionMessage);
-
-            Message<GraphQLMessage> errorMessage = MessageBuilder.createMessage(startSubscriptionErrors,
-                                                                                messageHeaderAccessor.getMessageHeaders());
+            Message<GraphQLMessage> errorMessage = MessageBuilder.createMessage(startSubscriptionErrors, headers);
 
             getClientOutboundChannel().send(errorMessage);
         }
@@ -315,7 +311,7 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
             // Send data
             getClientOutboundChannel().send(dataMessage);
             
-            GraphQLMessage completeData = new GraphQLMessage(id, GraphQLMessageType.COMPLETE, Collections.emptyMap());
+            GraphQLMessage completeData = new GraphQLMessage(id, GraphQLMessageType.COMPLETE);
 
             Message<?> completeMessage = MessageBuilder.createMessage(completeData, headerAccessor.getMessageHeaders());
             
@@ -452,7 +448,7 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
 		}
 		initHeaders(accessor);
 
-		GraphQLMessage disconnect = new GraphQLMessage(null, GraphQLMessageType.CONNECTION_ERROR, Collections.emptyMap());
+		GraphQLMessage disconnect = new GraphQLMessage(null, GraphQLMessageType.CONNECTION_ERROR);
 
 		Message<GraphQLMessage> message = MessageBuilder.createMessage(disconnect, accessor.getMessageHeaders());
 
@@ -542,7 +538,7 @@ public class GraphQLBrokerMessageHandler extends AbstractBrokerMessageHandler {
 					initHeaders(accessor);
 					MessageHeaders headers = accessor.getMessageHeaders();
 
-					GraphQLMessage heartbeat = new GraphQLMessage(null, GraphQLMessageType.KA, Collections.emptyMap());
+					GraphQLMessage heartbeat = new GraphQLMessage(null, GraphQLMessageType.KA);
 
 					getClientOutboundChannel().send(MessageBuilder.createMessage(heartbeat, headers));
 				}

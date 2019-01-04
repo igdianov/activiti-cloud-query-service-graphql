@@ -15,56 +15,24 @@
  */
 package org.activiti.cloud.services.graphql.ws.api;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
-
-public class GraphQLMessage implements Message<Map<String, Object>> {
+public class GraphQLMessage {
 
 	private Map<String, Object> payload;
 	private String id;
 	private GraphQLMessageType type;
 
-	private final MessageHeaders headers = new MutableMessageHeaders();
-
-	/**
-	 * Create a new message with the given payload.
-	 * @param payload the message payload (never {@code null})
-	 */
-	public GraphQLMessage(Map<String, Object> payload) {
-		this(payload, new MessageHeaders(null));
-	}
-
-	/**
-	 * Create a new message with the given payload and headers.
-	 * The content of the given header map is copied.
-	 * @param payload the message payload (never {@code null})
-	 * @param headers message headers to use for initialization
-	 */
-	public GraphQLMessage(Map<String, Object> payload, Map<String, Object> headers) {
-		this(payload, new MessageHeaders(headers));
-	}
-
-	/**
-	 * A constructor with the {@link MessageHeaders} instance to use.
-	 * <p><strong>Note:</strong> the given {@code MessageHeaders} instance is used
-	 * directly in the new message, i.e. it is not copied.
-	 * @param payload the message payload (never {@code null})
-	 * @param headers message headers
-	 */
-	public GraphQLMessage(Map<String, Object> payload, MessageHeaders headers) {
-		Assert.notNull(payload, "Payload must not be null");
-		Assert.notNull(headers, "MessageHeaders must not be null");
-		this.payload = payload;
-		this.headers.putAll(headers);;
-	}
-
 	GraphQLMessage() {
 	}
 
+	
+    public GraphQLMessage(String id, GraphQLMessageType type) {
+        this(id, type, Collections.emptyMap());
+    }
+	
 	public GraphQLMessage(String id, GraphQLMessageType type, Map<String, Object> payload) {
 		super();
 		this.payload = payload;
@@ -72,7 +40,6 @@ public class GraphQLMessage implements Message<Map<String, Object>> {
 		this.type = type;
 	}
 
-	@Override
 	public Map<String, Object> getPayload() {
 		return payload;
 	}
@@ -86,11 +53,6 @@ public class GraphQLMessage implements Message<Map<String, Object>> {
 	}
 
 	@Override
-	public MessageHeaders getHeaders() {
-		return headers;
-	}
-
-	@Override
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
@@ -99,14 +61,12 @@ public class GraphQLMessage implements Message<Map<String, Object>> {
 			return false;
 		}
 		GraphQLMessage otherMsg = (GraphQLMessage) other;
-		// Using nullSafeEquals for proper array equals comparisons
-		return (ObjectUtils.nullSafeEquals(this.payload, otherMsg.payload) && this.headers.equals(otherMsg.headers));
+		return (Objects.equals(this.payload, otherMsg.getPayload()));
 	}
 
 	@Override
 	public int hashCode() {
-		// Using nullSafeHashCode for proper array hashCode handling
-		return (ObjectUtils.nullSafeHashCode(this.payload) * 23 + this.headers.hashCode());
+		return (Objects.hashCode(this.payload) * 23);
 	}
 
 	@Override
@@ -114,20 +74,9 @@ public class GraphQLMessage implements Message<Map<String, Object>> {
 		StringBuilder sb = new StringBuilder(getClass().getSimpleName());
 		sb.append(" [payload=");
 		sb.append(this.payload);
-		sb.append(", headers=").append(this.headers).append("]");
+        sb.append(", id=").append(this.id);
+        sb.append(", type=").append(this.type).append("]");
 		return sb.toString();
 	}
 
-	@SuppressWarnings("serial")
-	private static class MutableMessageHeaders extends MessageHeaders {
-
-		public MutableMessageHeaders() {
-			super(null, MessageHeaders.ID_VALUE_NONE, -1L);
-		}
-
-		@Override
-		public Map<String, Object> getRawHeaders() {
-			return super.getRawHeaders();
-		}
-	}
 }
